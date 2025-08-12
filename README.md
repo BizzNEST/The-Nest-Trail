@@ -1,17 +1,14 @@
-# Project Title
+# The Nest Trail
 
-A brief description of what this project does and who it's for.
+A text-based adventure game that is a play on the popular game The Oregon Trail.
+
+[The Nest Trail Game Document](https://docs.google.com/document/d/152v0GMVGut542ITzNfpjr7s40q4v0ZtWRLWtSYlPOWw/edit?tab=t.0)
 
 ## Table of Contents
 
 - [Project Title](#project-title)
 - [Table of Contents](#table-of-contents)
 - [Installation](#installation)
-- [Usage](#usage)
-- [Features](#features)
-- [Contributing](#contributing)
-- [License](#license)
-- [Contact](#contact)
 
 ## Installation
 
@@ -25,16 +22,12 @@ Step-by-step instructions on how to get the development environment running.
     ```sh
     cd your-repo
     ```
-3. Install dependencies:
+3. Install dependencies (in both frontend and backend directories):
     ```sh
     npm install
     ```
 4. Run the development server:
     ```sh
-    npm start
+    npm run dev
     ```
-
-## Usage
-
-Instructions and examples for using the project. Include code snippets and screenshots as needed.
 
