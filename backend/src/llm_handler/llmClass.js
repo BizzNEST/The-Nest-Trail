@@ -1,5 +1,6 @@
 import dotenv from 'dotenv';
 import OpenAI from "openai";
+import { llmTool, llmToolProperty } from '../llm_tools/toolClass.js';
 
 dotenv.config();
 
@@ -21,29 +22,80 @@ class llmClass {
     }
 
     async getResponse(message) {
-        let isToolCall = false;
         this.history.push({
             role: "user",
             content: message,
         });
-        const response = await this.client.responses.create({
-            model: this.model,
-            tools: this.tools,
-            input: this.history,
-        });
+
+        const tools = this.tools.map(tool => tool.formatOpenAIReadable());
+        const MAX_ITERATIONS = 10;
+        let iterations = 0;
+
+        while (iterations < MAX_ITERATIONS) {
+            const response = await this.client.responses.create({
+                model: this.model,
+                tools: tools,
+                input: this.history,
+            });
+
+            let hasToolCalls = false;
+
+            // Process all tool calls in the response
+            for (const output of response.output) {
+                if (output.type == "function_call") {
+                    hasToolCalls = true;
+                    
+                    // Find and execute the matching tool
+                    for (const tool of this.tools) {
+                        if (tool.name == output.name) {
+                            const args = JSON.parse(output.arguments);
+                            const result = tool.call(args);
+                            console.log(`Tool ${output.name} result:`, result);
+
+                            // Add tool result to history for context
+                            this.history.push({
+                                role: "user",
+                                content: `Tool ${output.name} was called with arguments ${output.arguments} and returned: ${JSON.stringify(result)}`
+                            });
+                            break;
+                        }
+                    }
+                }
+            }
+
+            // If no tool calls were made, add the assistant's response and exit
+            if (!hasToolCalls) {
+                this.history.push({
+                    role: "assistant",
+                    content: response.output_text,
+                });
+                return response.output_text;
+            }
+
+            iterations++;
+        }
+
+        // If we reach max iterations, return an error message
+        const errorMessage = "Error: Maximum iterations reached without a normal response.";
         this.history.push({
             role: "assistant",
-            content: response.output_text,
+            content: errorMessage,
         });
-
-        return response.output_text;
+        return errorMessage;
     }
 }
 
+function add(args) {
+    console.log("Adding " + args.x + " and " + args.y);
+    return args.x + args.y;
+}
+
+const addTool = new llmTool("add", "Add two numbers", {
+    x: new llmToolProperty("x", "number", "The first number"),
+    y: new llmToolProperty("y", "number", "The second number"),
+}, add);
 
 
-const llm = new llmClass(OPENAI_MODEL, []);
-const response = await llm.getResponse("remember the number 12");
+const llm = new llmClass(OPENAI_MODEL, [addTool]);
+const response = await llm.getResponse("Add 999 and 42");
 console.log(response);
-const response2 = await llm.getResponse("What is the number times 10?");
-console.log(response2);
