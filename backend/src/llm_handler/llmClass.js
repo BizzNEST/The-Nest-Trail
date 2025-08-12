@@ -90,12 +90,4 @@ function add(args) {
     return args.x + args.y;
 }
 
-const addTool = new llmTool("add", "Add two numbers", {
-    x: new llmToolProperty("x", "number", "The first number"),
-    y: new llmToolProperty("y", "number", "The second number"),
-}, add);
-
-
-const llm = new llmClass(OPENAI_MODEL, [addTool]);
-const response = await llm.getResponse("Add 999 and 42");
-console.log(response);
+export { llmClass };
