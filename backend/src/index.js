@@ -14,9 +14,6 @@ app.use(cors());
 // attach routes
 app.use('/', routes);
 
-// LLM API route
-app.post('/api/chat', sendMessage);
-
 // start server
 const PORT = process.env.PORT || 5050;
 app.listen(PORT, () => {
