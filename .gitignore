@@ -19,7 +19,7 @@ pnpm-debug.log*
 # -----------------------------
 .env
 .env.*
-!.env.example  # Keep example env files tracked
+!.env.example
 
 # -----------------------------
 # Build output
