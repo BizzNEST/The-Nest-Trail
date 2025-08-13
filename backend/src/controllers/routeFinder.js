@@ -25,6 +25,27 @@ function parseBool(val, def = false) {
   const v = String(val).toLowerCase();
   return v === 'true' || v === '1' || v === 'yes';
 }
+// Build outbound edges for each center, e.g. { Gilroy: [ {from:'Gilroy', to:'Salinas', ...}, ... ], ... }
+function buildEdgesByCenter(centers, weights, miles) {
+  const byCenter = {};
+  for (let i = 0; i < centers.length; i++) {
+    const from = centers[i];
+    const edges = [];
+    for (let j = 0; j < centers.length; j++) {
+      if (i === j) continue;
+      edges.push({
+        from,
+        to: centers[j],
+        weight: weights[i][j],
+        miles: miles[i][j],
+      });
+    }
+    // Sort by weight (then miles) so it's easy to read
+    edges.sort((a, b) => (a.weight - b.weight) || (a.miles - b.miles));
+    byCenter[from] = edges;
+  }
+  return byCenter;
+}
 
 export async function getLeaderboard(req, res, next) {
   try {
@@ -46,7 +67,8 @@ export async function getLeaderboard(req, res, next) {
       computeTsp,
     });
 
-    
+    const edgesByCenter = buildEdgesByCenter(centers, weights, miles);
+
     res.json({
       ok: true,
       start: centers[startIdx],
@@ -54,6 +76,7 @@ export async function getLeaderboard(req, res, next) {
       best: result.best,
       leaderboard: result.leaderboard,
       counts: result.counts,
+      edgesByCenter, // new: distances from EACH center to the others
       ...(result.tspOptimal && { tspOptimal: result.tspOptimal }),
     });
   } catch (err) {
