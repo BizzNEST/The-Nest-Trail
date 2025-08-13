@@ -83,3 +83,43 @@ export async function getLeaderboard(req, res, next) {
     next(err);
   }
 }
+
+
+function getPossiblePaths(currentLocation) { // the distance and event count for each possible path
+  const currentIdx = centers.indexOf(currentLocation);
+  if (currentIdx === -1) {
+    return [];
+  }
+
+  const possiblePaths = [];
+  for (let i = 0; i < centers.length; i++) {
+    if (i === currentIdx) continue; // Skip current location
+    
+    const destination = centers[i];
+    const distance = miles[currentIdx][i];
+    const weight = weights[currentIdx][i];
+    
+    // Calculate events based on weight (as it seems to represent difficulty/event likelihood)
+    const events = weight;
+    
+    possiblePaths.push(`${destination} (${distance} miles, ${events} events)`);
+  }
+  
+  return possiblePaths;
+}
+
+function getDistanceAndEventCount(currentLocation, destination) { // the distance and event count for a given path
+  const currentIdx = centers.indexOf(currentLocation);
+  const destIdx = centers.indexOf(destination);
+  
+  if (currentIdx === -1 || destIdx === -1) {
+    return { distance: 0, events: 0 };
+  }
+  
+  const distance = miles[currentIdx][destIdx];
+  const events = weights[currentIdx][destIdx];
+  
+  return { distance, events };
+}
+
+export { getPossiblePaths, getDistanceAndEventCount };
