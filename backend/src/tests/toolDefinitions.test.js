@@ -1,6 +1,6 @@
 import { addItemTool, removeItemTool } from '../llm_tools/toolDefinitions.js';
 import sharedInventory from '../../models/sharedInventory.js';
-import fetch from 'node-fetch'; 
+import fetch from 'node-fetch';
 
 const API_URL = 'http://localhost:5050/inventory/items'; 
 
