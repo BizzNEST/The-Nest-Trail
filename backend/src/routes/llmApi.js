@@ -1,6 +1,6 @@
+import { incrementMoves } from '../../models/incrementMoves.js';
 import { llmClass } from '../llm_handler/llmClass.js';
-import { addItemTool, removeItemTool } from '../llm_tools/toolDefinitions.js';
-
+import { addItemTool, getShopInfoTool, removeItemTool } from '../llm_tools/toolDefinitions.js';
 const system_prompt = `
 # System Prompt — *The NEST Trail* AI Game Master
 
@@ -73,7 +73,7 @@ Do not provide choices for events, the player has the ability to do literally an
 
 
 const OPENAI_MODEL = process.env.OPENAI_MODEL || 'gpt-5-nano';
-const llm = new llmClass(OPENAI_MODEL, [addItemTool, removeItemTool], system_prompt);
+const llm = new llmClass(OPENAI_MODEL, [addItemTool, removeItemTool, getShopInfoTool], system_prompt);
 
 export const sendMessage = async (req, res) => {
     try {
@@ -82,7 +82,7 @@ export const sendMessage = async (req, res) => {
         if (!message) {
             return res.status(400).json({ error: 'Message is required' });
         }
-
+        incrementMoves();
         const response = await llm.getResponse(message);
         res.json({ response });
     } catch (error) {

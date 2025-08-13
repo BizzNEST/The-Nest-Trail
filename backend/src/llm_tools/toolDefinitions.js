@@ -1,5 +1,8 @@
 import { llmTool, llmToolProperty } from './toolClass.js';
 import sharedInventory from '../../models/sharedInventory.js';
+import shopInventory from '../../models/shopInventory.js';
+import gameState from '../../models/gameState.js';
+import { incrementMoves } from '../../models/incrementMoves.js';
 
 const addItemTool = new llmTool(
     'addItem',
@@ -30,4 +33,27 @@ const removeItemTool = new llmTool(
     }
 );
 
-export { addItemTool, removeItemTool };
+const getShopInfoTool = new llmTool(
+    'getShopInfo',
+    'Retrieves shop information for the current location with dynamic pricing based on moves',
+    {
+        location: new llmToolProperty('location', 'string', 'The name of the location', true),
+    },
+    (args) => {
+        const { location } = args;
+        incrementMoves();
+        const shopInfo = shopInventory[location];
+        if (!shopInfo) {
+            throw new Error(`No shop information available for location: ${location}`);
+        }
+
+        const adjustedShopInfo = shopInfo.map(item => ({
+            item: item.item,
+            price: Math.round(item.basePrice * (1 + gameState.moves * 0.05)),
+        }));
+
+        return adjustedShopInfo;
+    }
+);
+
+export { addItemTool, removeItemTool, getShopInfoTool };
