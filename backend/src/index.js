@@ -13,6 +13,7 @@ app.use(cors());
 
 // attach routes
 app.use('/', routes);
+app.use('/inventory', routes)
 
 // start server
 const PORT = process.env.PORT || 5050;
