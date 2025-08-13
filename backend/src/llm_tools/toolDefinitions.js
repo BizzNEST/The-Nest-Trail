@@ -7,7 +7,7 @@ const addItemTool = new llmTool(
     {
         name: new llmToolProperty('name', 'string', 'Name of the item', true),
         description: new llmToolProperty('description', 'string', 'Description of the item', true),
-        count: new llmToolProperty('count', 'integer', 'Number of items to add', true),
+        count: new llmToolProperty('count', 'number', 'Number of items to add', true),
     },
     (args) => {
         const { name, description, count } = args;
@@ -21,7 +21,7 @@ const removeItemTool = new llmTool(
     'Removes an item from the inventory',
     {
         name: new llmToolProperty('name', 'string', 'Name of the item', true),
-        count: new llmToolProperty('count', 'integer', 'Number of items to remove', true),
+        count: new llmToolProperty('count', 'number', 'Number of items to remove', true),
     },
     (args) => {
         const { name, count } = args;
