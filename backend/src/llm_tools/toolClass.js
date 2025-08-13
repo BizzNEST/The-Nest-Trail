@@ -1,5 +1,3 @@
-import sharedInventory from "../../models/sharedInventory.js";
-
 class llmToolProperty {
 
     constructor(name, type, description, required = true) {
@@ -33,7 +31,7 @@ class llmTool {
 
     // Make the instance callable, delegating to execute
     call(args) {
-        return this.execute(args, sharedInventory);
+        return this.execute(args);
     }
 
     formatOpenAIReadable() {
