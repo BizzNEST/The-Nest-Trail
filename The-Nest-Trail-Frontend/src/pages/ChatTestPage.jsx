@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { sendMessage } from '../api/api';
+import { useState, useEffect, useRef } from 'react';
+import { sendMessage, startGame } from '../api/api';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 
@@ -7,6 +7,29 @@ function ChatTestPage() {
     const [messages, setMessages] = useState([]);
     const [input, setInput] = useState('');
     const [loading, setLoading] = useState(false);
+    // if we prompted make sure we use a flag to prevent double invoking due to React.StrictMode
+    const didStart = useRef(false);
+
+    // when we land on this page we'll prompt the LLM to start the game
+    useEffect(() => {
+        if (didStart.current) return;
+        didStart.current = true;
+        setLoading(true);
+        async function start() {
+            try {
+                const response = await startGame();
+                const botMessage = { text: response, sender: 'bot' };
+                setMessages(prev => [...prev, botMessage]);
+            } catch (error) {
+                console.error('Error sending message:', error);
+                const errorMessage = { text: 'Error: Failed to get response', sender: 'bot' };
+                setMessages(prev => [...prev, errorMessage]);
+            } finally {
+                setLoading(false);
+            }
+        }
+        start();
+    }, []);
 
     const handleSend = async () => {
         if (!input.trim()) return;
