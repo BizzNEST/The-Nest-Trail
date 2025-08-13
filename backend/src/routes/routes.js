@@ -11,7 +11,7 @@ router.get('/api/health', (_req, res) => {
   res.json({ ok: true, time: new Date().toISOString() });
 });
 
-// Leaderboard for hardcoded graph
+// Leaderboard for hardcoded graph between centers
 router.get('/api/routes/graphTraversal', getLeaderboard);
 
 export default router;
