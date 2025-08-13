@@ -1,5 +1,33 @@
 import { llmClass } from '../llm_handler/llmClass.js';
-import { addItemTool, removeItemTool } from '../llm_tools/toolDefinitions.js';
+import sharedInventory from '../../models/sharedInventory.js';
+import {
+  addItemTool,
+  removeItemTool,
+  addMoneyTool,
+  removeMoneyTool,
+  getMoneyTool,
+  listInventoryTool
+} from '../llm_tools/toolDefinitions.js';
+
+// --- Default inventory setup ---
+sharedInventory.clearInventory();
+sharedInventory.setMoney(100); // <-- Using Inventory.setMoney
+
+sharedInventory.addItem('Laptops', 'Portable computers for work', 1);
+sharedInventory.addItem('Coffee', 'Hot caffeinated beverage', 3);
+sharedInventory.addItem('Gas', 'Fuel for travel', 3);
+sharedInventory.addItem('Spare Tires', 'Tires for replacing damaged ones', 1);
+sharedInventory.addItem('Laptop Chargers', 'Chargers for laptops', 1);
+
+// --- Tools array ---
+const tools = [
+  addItemTool,
+  removeItemTool,
+  addMoneyTool,
+  removeMoneyTool,
+  getMoneyTool,
+  listInventoryTool
+];
 
 const system_prompt = `
 # System Prompt — *The NEST Trail* AI Game Master
@@ -73,7 +101,7 @@ Do not provide choices for events, the player has the ability to do literally an
 
 
 const OPENAI_MODEL = process.env.OPENAI_MODEL || 'gpt-5-nano';
-const llm = new llmClass(OPENAI_MODEL, [addItemTool, removeItemTool], system_prompt);
+const llm = new llmClass(OPENAI_MODEL, tools, system_prompt);
 
 export const sendMessage = async (req, res) => {
     try {
