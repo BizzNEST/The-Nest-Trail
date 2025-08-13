@@ -19,6 +19,10 @@ class llmClass {
         this.instructions = instructions;
         this.client = new OpenAI();
         this.history = [];
+        this.history.push({
+            role: "system",
+            content: instructions
+        })
     }
 
     async getResponse(message) {
