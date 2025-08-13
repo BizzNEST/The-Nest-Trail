@@ -1,5 +1,7 @@
 import { llmClass } from '../llm_handler/llmClass.js';
 import { llmTool, llmToolProperty } from '../llm_tools/toolClass.js';
+import { addItemTool, removeItemTool } from '../llm_tools/toolDefinitions.js';
+
 
 // Initialize LLM with a simple add tool
 function add(args) {
@@ -84,7 +86,7 @@ Do not provide choices for events, the player has the ability to do literally an
 
 
 const OPENAI_MODEL = process.env.OPENAI_MODEL || 'gpt-5-nano';
-const llm = new llmClass(OPENAI_MODEL, [addTool], system_prompt);
+const llm = new llmClass(OPENAI_MODEL, [addTool, addItemTool, removeItemTool], system_prompt);
 
 export const sendMessage = async (req, res) => {
     try {
