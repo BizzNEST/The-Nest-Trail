@@ -46,4 +46,4 @@ class llmTool {
 }
 
 
-export { llmTool, llmToolProperty, addItemLLMTool };
+export { llmTool, llmToolProperty };
