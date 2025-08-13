@@ -1,18 +1,22 @@
 import { Router } from 'express';
+import { getLeaderboard } from '../controllers/routeFinder.js';
 import { sendMessage } from './llmApi.js';
 import sharedInventory from '../../models/sharedInventory.js';
 
+
 const router = Router();
 
-// root route
 router.get('/', (_req, res) => {
   res.send('Hello world');
 });
 
-// health route
 router.get('/api/health', (_req, res) => {
   res.json({ ok: true, time: new Date().toISOString() });
 });
+
+
+// Leaderboard for hardcoded graph between centers
+router.get('/api/routes/graphTraversal', getLeaderboard);
 
 // LLM API route
 router.post('/api/chat', sendMessage);
@@ -27,5 +31,6 @@ router.get('/items', (req, res) => {
       res.status(500).json({ error: 'Failed to fetch items' });
   }
 });
+
 
 export default router;
