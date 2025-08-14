@@ -34,12 +34,12 @@ class Inventory {
 
   removeItem(name, count) {
      if (!Number.isInteger(count) || count <= 0) {
-      throw new Error('Invalid remove count.')
+      return "Invalid remove count.  Please check your inventory and try again."
      }
     const existingItem = this.items.find(item => item.name === name);
     if (!existingItem) {
       console.warn(`Item with name "${name}" not found.`);
-      return;
+      return "Item not found.  Please check your inventory and try again.";
     }
   
     if (existingItem.count < count) {
@@ -53,6 +53,7 @@ class Inventory {
     if (existingItem.count === 0) {
       this.items = this.items.filter(item => item.name !== name);
     }
+    return "Successfully removed " + count + " " + name + " from inventory"
   }
 
   clearInventory() {

@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { sendMessage, startGame } from '../api/api';
+import { sendMessage, startGame, fetchStats } from '../api/api';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import ChatBackground from '../components/ChatBackground';
@@ -10,11 +10,16 @@ function ChatTestPage() {
     const [loading, setLoading] = useState(false);
     const messagesEndRef = useRef(null);
     const didStart = useRef(false);
-    // placeholder game stats state
-    const [inGameSeconds, setInGameSeconds] = useState(0);
-    const [macguffinsCount] = useState(3); // placeholder value
-    const [currentRoute] = useState({ from: 'Santa Cruz', to: 'Watsonville' }); // placeholder value
+    // game stats state
+    const [stats, setStats] = useState({
+        elapsedMinutes: 0,
+        currentLocation: 'Loading...'
+    });
+    const [statsLoading, setStatsLoading] = useState(false);
+    // These variables are intentionally unused but kept for future implementation
+    // eslint-disable-next-line no-unused-vars
     const [inventory, setInventory] = useState([]); // State to hold inventory items
+    // eslint-disable-next-line no-unused-vars
     const [inventoryLoading, setInventoryLoading] = useState(false); // Loading state for inventory
 
     const tempInventory = [
@@ -45,6 +50,23 @@ function ChatTestPage() {
         }
     ]
 
+    // Fetch stats from backend
+    const fetchGameStats = async (showLoading = false) => {
+        if (showLoading) {
+            setStatsLoading(true);
+        }
+        try {
+            const statsData = await fetchStats();
+            setStats(statsData);
+        } catch (error) {
+            console.error('Error fetching stats:', error);
+        } finally {
+            if (showLoading) {
+                setStatsLoading(false);
+            }
+        }
+    };
+
     // Fetch inventory and start the game on initial component load
     useEffect(() => {
         // Fetch inventory items
@@ -66,6 +88,7 @@ function ChatTestPage() {
         };
 
         fetchInventory();
+        fetchGameStats(true);
 
         // Start the game by prompting the LLM
         if (didStart.current) return;
@@ -87,20 +110,19 @@ function ChatTestPage() {
         start();
     }, []);
 
-    // increment in-game time every second (placeholder timer)
+    // Periodically fetch stats to keep them updated
     useEffect(() => {
         const intervalId = setInterval(() => {
-            setInGameSeconds((prev) => prev + 1);
-        }, 1000);
+            fetchGameStats(); // Don't show loading for periodic updates
+        }, 5000); // Update every 5 seconds
         return () => clearInterval(intervalId);
     }, []);
 
-    const formatTime = (totalSeconds) => {
-        const hours = Math.floor(totalSeconds / 3600);
-        const minutes = Math.floor((totalSeconds % 3600) / 60);
-        const seconds = totalSeconds % 60;
+    const formatTime = (totalMinutes) => {
+        const hours = Math.floor(totalMinutes / 60);
+        const minutes = totalMinutes % 60;
         const pad = (n) => String(n).padStart(2, '0');
-        return `${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
+        return `${pad(hours)}:${pad(minutes)}`;
     };
 
     const handleSend = async () => {
@@ -150,16 +172,18 @@ function ChatTestPage() {
                         <div className="inventory-list">
                             <div className="inventory-item">
                                 <span className="item-emoji">⏱️</span>
-                                <span className="item-name">Time Elapsed — {formatTime(inGameSeconds)}</span>
+                                <span className="item-name">Time Elapsed — {formatTime(stats.elapsedMinutes)}</span>
                             </div>
                             <div className="inventory-item">
-                                <span className="item-emoji">🔮</span>
-                                <span className="item-name">MacGuffins — {macguffinsCount} / 5</span>
+                                <span className="item-emoji">📍</span>
+                                <span className="item-name">Current Location — {stats.currentLocation}</span>
                             </div>
-                            <div className="inventory-item">
-                                <span className="item-emoji">🧭</span>
-                                <span className="item-name">Current Route — {currentRoute.from} → {currentRoute.to}</span>
-                            </div>
+                            {statsLoading && (
+                                <div className="inventory-item">
+                                    <span className="item-emoji">🔄</span>
+                                    <span className="item-name">Loading stats...</span>
+                                </div>
+                            )}
                         </div>
                     </div>
                     
