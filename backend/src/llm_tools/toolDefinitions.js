@@ -75,7 +75,10 @@ const listInventoryTool = new llmTool(
   'listInventory',
   'Returns the list of inventory items with counts.',
   {},
-  () => ({ items: sharedInventory.listItems() })
+  () => ({ 
+    money: sharedInventory.getMoney(),
+    items: sharedInventory.listItems()
+    })
 );
 
 export {

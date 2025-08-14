@@ -43,7 +43,9 @@ class Inventory {
     }
   
     if (existingItem.count < count) {
-      throw new Error(`Not enough ${name}  to remove. Available count: ${existingItem.count}`);
+      const message = `Not enough ${name} to remove. Available count: ${existingItem.count}`;
+      console.log(message);
+      return message;
     }
 
     existingItem.count -= count;
@@ -59,11 +61,12 @@ class Inventory {
   }
 
   listItems() {
-    return this.items;
+    return {
+      items: this.items,
+      money: this.money
+    };
   }
-  getMoney() {
-    return this.money;
-  }
+  
   setMoney(value) {
     if (!Number.isInteger(value)|| value < 0) {
       throw new Error('Invalid money value')
@@ -83,7 +86,9 @@ class Inventory {
       throw new Error('Amount to remove must be a positive integer')
     }
     if (this.money < amount) {
-        throw new Error(`Insufficient funds. Current balance: ${this.money}`)
+      const message = `Insufficient funds. Current balance: ${this.money}`;
+      console.log(message);
+      return message;
     }
     this.money -= amount;
     return this.money;
