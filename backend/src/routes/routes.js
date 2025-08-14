@@ -22,7 +22,7 @@ router.get('/api/routes/graphTraversal', getLeaderboard);
 router.post('/api/chat', sendMessage);
 
 // Inventory API route
-router.get('/items', (req, res) => {
+router.get('/api/items', (req, res) => {
   try {
       const items = sharedInventory.listItems();
       res.status(200).json(items);
