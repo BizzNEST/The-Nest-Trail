@@ -12,6 +12,34 @@ function ChatTestPage() {
     const [inventory, setInventory] = useState([]); // State to hold inventory items
     const [inventoryLoading, setInventoryLoading] = useState(false); // Loading state for inventory
 
+    const tempInventory = [
+        {
+            name: 'Laptop',
+            emoji: '💻',
+            amount: 1
+        },
+        {
+            name: 'Coffee', 
+            emoji: '☕',
+            amount: 5
+        },
+        {
+            name: 'Money',
+            emoji: '💰',
+            amount: 1000
+        },
+        {
+            name: 'Gas',
+            emoji: '🚗',
+            amount: 100
+        },
+        {
+            name: 'MacGuffins',
+            emoji: '🔮',
+            amount: 1
+        }
+    ]
+
     // Fetch inventory and start the game on initial component load
     useEffect(() => {
         // Fetch inventory items
@@ -23,7 +51,8 @@ function ChatTestPage() {
                     throw new Error('Failed to fetch inventory');
                 }
                 const items = await response.json();
-                setInventory(items);
+                console.log(items);
+                setInventory(tempInventory);
             } catch (error) {
                 console.error('Error fetching inventory:', error);
             } finally {
@@ -109,21 +138,17 @@ function ChatTestPage() {
                         <h3 className="inventory-title">Inventory</h3>
                         <div className="inventory-list">
                             {/* Display a loading message while fetching */}
-                            {inventoryLoading ? (
-                                <div className="loading-message">Loading inventory...</div>
-                            ) : inventory.length > 0 ? (
-                                // Map over the inventory array and render each item
-                                inventory.map((item, index) => (
+                            {
+                                tempInventory.map((item, index) => (
                                     <div key={index} className="inventory-item">
-                                        <span className="item-emoji">{item.emoji}</span>
-                                        <span className="item-name">{item.name}</span>
+                                        <div className="item-name-container">
+                                            <span className="item-emoji">{item.emoji}</span>
+                                            <span className="item-name">{item.name}</span>
+                                        </div>
                                         <span className="item-amount">{item.amount}</span>
                                     </div>
                                 ))
-                            ) : (
-                                // Display a message if no items are found
-                                <div className="inventory-empty">Your inventory is empty.</div>
-                            )}
+                            }
                         </div>
                     </div>
                 </div>
