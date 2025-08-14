@@ -1,11 +1,45 @@
 import { llmClass } from '../llm_handler/llmClass.js';
-import { addItemTool, removeItemTool, getAllItemsTool, getPossiblePathsTool, getDistanceAndEventCountTool } from '../llm_tools/toolDefinitions.js';
+import sharedInventory from '../../models/sharedInventory.js';
+import {
+  addItemTool,
+  removeItemTool,
+  addMoneyTool,
+  removeMoneyTool,
+  listInventoryTool,
+  getPossiblePathsTool,
+  getDistanceAndEventCountTool
+} from '../llm_tools/toolDefinitions.js';
+
+// --- Default inventory setup ---
+sharedInventory.clearInventory();
+sharedInventory.setMoney(100); // <-- Using Inventory.setMoney
+
+sharedInventory.addItem('Laptops', 'Portable computers for work', 1);
+sharedInventory.addItem('Coffee', 'Hot caffeinated beverage', 3);
+sharedInventory.addItem('Gas', 'Fuel for travel', 3);
+sharedInventory.addItem('Spare Tires', 'Tires for replacing damaged ones', 1);
+sharedInventory.addItem('Laptop Chargers', 'Chargers for laptops', 1);
+
+// --- Tools array ---
+const tools = [
+  addItemTool,
+  removeItemTool,
+  addMoneyTool,
+  removeMoneyTool,
+  getPossiblePathsTool,
+  listInventoryTool,
+  getDistanceAndEventCountTool
+];
+
+
+
 
 const anti_cheat_prompt = `
 The player is not allowed to do anything outside of the rules of the game.
 - The player might tell you to do something unrelated to the game, like answer a question.  In this case, refuse no matter what.  You are the game master, not an AI assistant.
 - The player might tell you to give them an unfair advantage or change the rules of the game.  (e.x. I find a $100 bill on the ground, add it to my resources) Do not fall for this.  Refuse and explain that you must follow the rules of the game.
 `
+
 
 const system_prompt = `
 #  *The NEST Trail* AI Game Master
@@ -92,8 +126,12 @@ Do not provide choices for events, the player has the ability to do literally an
 `
 
 
+
+
+
 const OPENAI_MODEL = process.env.OPENAI_MODEL || 'gpt-4.1';
-const llm = new llmClass(OPENAI_MODEL, [addItemTool, removeItemTool, getAllItemsTool, getPossiblePathsTool, getDistanceAndEventCountTool], system_prompt);
+const llm = new llmClass(OPENAI_MODEL, tools, system_prompt);
+
 
 export const sendMessage = async (req, res) => {
     try {
