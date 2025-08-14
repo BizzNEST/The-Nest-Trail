@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { sendMessage, startGame } from '../api/api';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import ChatBackground from '../components/ChatBackground';
 
 function ChatTestPage() {
     const [messages, setMessages] = useState([]);
@@ -72,6 +73,7 @@ function ChatTestPage() {
 
     return (
         <div className="chat-page">
+            <ChatBackground />
             <div className="chat-layout">
                 {/* Left Column - Map and Inventory */}
                 <div className="map-column">
