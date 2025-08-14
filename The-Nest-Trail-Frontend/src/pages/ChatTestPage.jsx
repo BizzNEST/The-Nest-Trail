@@ -4,6 +4,15 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import ChatBackground from '../components/ChatBackground';
 
+const emojiMap = {
+  "Laptops": "💻",
+  "Coffee": "☕️",
+  "Gas": "⛽️",
+  "Spare Tires": "🛞",
+  "Laptop Chargers": "🔋",
+  "Money": "💰"
+};
+
 function ChatTestPage() {
     const [messages, setMessages] = useState([]);
     const [input, setInput] = useState('');
@@ -173,25 +182,27 @@ function ChatTestPage() {
                     <div className="inventory-container inventory-container--tall">
                         <h3 className="inventory-title">Inventory</h3>
                         <div className="inventory-list">
-                            <div className="inventory-item">
-                                <div className="item-name-container">
-                                    <span className="item-emoji">💰</span>
-                                    <span className="item-name">Money</span>
-                                </div>
-                                <span className="item-amount">{money}</span>
-                            </div>
                             {inventoryLoading ? (
                                 <div className="inventory-loading">Loading inventory...</div>
                             ) : inventory.length > 0 ? (
-                                inventory.map((item, index) => (
-                                    <div key={index} className="inventory-item">
+                                <>
+                                    <div className="inventory-item">
                                         <div className="item-name-container">
-                                            <span className="item-emoji">{item.emoji || '📦'}</span>
-                                            <span className="item-name">{item.name}</span>
-                                        </div>
-                                        <span className="item-amount">{item.count}</span>
+                                            <span className="item-emoji">{emojiMap['Money']}</span>
+                                            <span className="item-name">Money</span>
                                     </div>
-                                ))
+                                    <span className="item-amount">{money}</span>
+                                    </div>
+                                    {inventory.map((item, index) => (
+                                        <div key={index} className="inventory-item">
+                                            <div className="item-name-container">
+                                                <span className="item-emoji">{emojiMap[item.name] || '📦'}</span>
+                                                <span className="item-name">{item.name}</span>
+                                            </div>
+                                            <span className="item-amount">{item.count}</span>
+                                        </div>
+                                    ))}
+                                </>
                             ) : (
                                 <div className="inventory-empty">No items in inventory</div>
                             )}
