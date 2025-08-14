@@ -5,9 +5,7 @@ import {
   removeItemTool,
   addMoneyTool,
   removeMoneyTool,
-  getMoneyTool,
   listInventoryTool,
-  getAllItemsTool,
   getPossiblePathsTool,
   getDistanceAndEventCountTool
 } from '../llm_tools/toolDefinitions.js';
@@ -26,7 +24,6 @@ sharedInventory.addItem('Laptop Chargers', 'Chargers for laptops', 1);
 const tools = [
   addItemTool,
   removeItemTool,
-  getAllItemsTool,
   addMoneyTool,
   removeMoneyTool,
   getPossiblePathsTool,

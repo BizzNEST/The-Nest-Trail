@@ -9,15 +9,65 @@ function ChatTestPage() {
     const [input, setInput] = useState('');
     const [loading, setLoading] = useState(false);
     const messagesEndRef = useRef(null);
-    // if we prompted make sure we use a flag to prevent double invoking due to React.StrictMode
     const didStart = useRef(false);
     // placeholder game stats state
     const [inGameSeconds, setInGameSeconds] = useState(0);
     const [macguffinsCount] = useState(3); // placeholder value
     const [currentRoute] = useState({ from: 'Santa Cruz', to: 'Watsonville' }); // placeholder value
+    const [inventory, setInventory] = useState([]); // State to hold inventory items
+    const [inventoryLoading, setInventoryLoading] = useState(false); // Loading state for inventory
 
-    // when we land on this page we'll prompt the LLM to start the game
+    const tempInventory = [
+        {
+            name: 'Laptop',
+            emoji: '💻',
+            amount: 1
+        },
+        {
+            name: 'Coffee', 
+            emoji: '☕',
+            amount: 5
+        },
+        {
+            name: 'Money',
+            emoji: '💰',
+            amount: 1000
+        },
+        {
+            name: 'Gas',
+            emoji: '🚗',
+            amount: 100
+        },
+        {
+            name: 'MacGuffins',
+            emoji: '🔮',
+            amount: 1
+        }
+    ]
+
+    // Fetch inventory and start the game on initial component load
     useEffect(() => {
+        // Fetch inventory items
+        const fetchInventory = async () => {
+            setInventoryLoading(true);
+            try {
+                const response = await fetch('/items');
+                if (!response.ok) {
+                    throw new Error('Failed to fetch inventory');
+                }
+                const items = await response.json();
+                console.log(items);
+                setInventory(tempInventory);
+            } catch (error) {
+                console.error('Error fetching inventory:', error);
+            } finally {
+                setInventoryLoading(false);
+            }
+        };
+
+        fetchInventory();
+
+        // Start the game by prompting the LLM
         if (didStart.current) return;
         didStart.current = true;
         setLoading(true);
@@ -89,15 +139,13 @@ function ChatTestPage() {
         }
     };
 
-
-
     return (
         <div className="chat-page">
             <ChatBackground />
             <div className="chat-layout">
                 {/* Left Column - Map and Inventory */}
                 <div className="map-column">
-                    <div className="map-container stats-container">
+                <div className="map-container stats-container">
                         <h3 className="map-title">Game Stats</h3>
                         <div className="inventory-list">
                             <div className="inventory-item">
@@ -118,26 +166,36 @@ function ChatTestPage() {
                     <div className="inventory-container inventory-container--tall">
                         <h3 className="inventory-title">Inventory</h3>
                         <div className="inventory-list">
-                            <div className="inventory-item">
-                                <span className="item-emoji">💻</span>
-                                <span className="item-name">laptop</span>
-                            </div>
-                            <div className="inventory-item">
-                                <span className="item-emoji">☕</span>
-                                <span className="item-name">coffee</span>
-                            </div>
-                            <div className="inventory-item">
-                                <span className="item-emoji">⛽</span>
-                                <span className="item-name">gas</span>
-                            </div>
-                            <div className="inventory-item">
-                                <span className="item-emoji">💰</span>
-                                <span className="item-name">money</span>
-                            </div>
-                            <div className="inventory-item">
-                                <span className="item-emoji">🔮</span>
-                                <span className="item-name">macguffins</span>
-                            </div>
+                           {/* Display a loading message while fetching */}
+                           {
+                                tempInventory.map((item, index) => (
+                                    <div key={index} className="inventory-item">
+                                        <div className="item-name-container">
+                                            <span className="item-emoji">{item.emoji}</span>
+                                            <span className="item-name">{item.name}</span>
+                                        </div>
+                                        <span className="item-amount">{item.amount}</span>
+                                    </div>
+                                ))
+                            }
+                        </div>
+                    </div>
+                    
+                    <div className="inventory-container inventory-container--tall">
+                        <h3 className="inventory-title">Inventory</h3>
+                        <div className="inventory-list">
+                            {/* Display a loading message while fetching */}
+                            {
+                                tempInventory.map((item, index) => (
+                                    <div key={index} className="inventory-item">
+                                        <div className="item-name-container">
+                                            <span className="item-emoji">{item.emoji}</span>
+                                            <span className="item-name">{item.name}</span>
+                                        </div>
+                                        <span className="item-amount">{item.amount}</span>
+                                    </div>
+                                ))
+                            }
                         </div>
                     </div>
                 </div>

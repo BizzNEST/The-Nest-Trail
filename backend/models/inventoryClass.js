@@ -73,6 +73,11 @@ class Inventory {
     }
     this.money = value;
   }
+
+  getMoney() {
+    return this.money;
+  }
+
   addMoney(amount) {
     if (!Number.isInteger(amount) || amount <= 0) {
       throw new Error('Amount to add must be a positive integer')
