@@ -1,5 +1,6 @@
 import { llmTool, llmToolProperty } from './toolClass.js';
 import sharedInventory from '../../models/sharedInventory.js';
+import { getRandInt } from '../services/randomNum.js';
 import { getPossiblePaths, getDistanceAndEventCount } from '../controllers/routeFinder.js';
 
 // Item tools
@@ -75,3 +76,16 @@ const getDistanceAndEventCountTool = new llmTool(
 );
 
 export { addItemTool, removeItemTool, getAllItemsTool, getPossiblePathsTool, getDistanceAndEventCountTool };
+const eventDifficulty = new llmTool(
+    'eventDifficulty',
+    'Gets difficulty of generated event',
+    {
+        modifier: new llmToolProperty('difficultyModifier', 'number', 'Positive or negative number to adjust difficulty', true)
+    },
+    (args) => {
+        const num = getRandInt();
+        return `The player rolled a ${num}.`;
+    }
+)
+
+export { addItemTool, removeItemTool, eventDifficulty };
