@@ -75,7 +75,6 @@ const getDistanceAndEventCountTool = new llmTool(
     }
 );
 
-export { addItemTool, removeItemTool, getAllItemsTool, getPossiblePathsTool, getDistanceAndEventCountTool };
 const eventDifficulty = new llmTool(
     'eventDifficulty',
     'Gets difficulty of generated event',
@@ -88,4 +87,4 @@ const eventDifficulty = new llmTool(
     }
 )
 
-export { addItemTool, removeItemTool, eventDifficulty };
+export { addItemTool, removeItemTool, getAllItemsTool, getPossiblePathsTool, getDistanceAndEventCountTool , eventDifficulty };
