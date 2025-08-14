@@ -8,11 +8,32 @@ function ChatTestPage() {
     const [input, setInput] = useState('');
     const [loading, setLoading] = useState(false);
     const messagesEndRef = useRef(null);
-    // if we prompted make sure we use a flag to prevent double invoking due to React.StrictMode
     const didStart = useRef(false);
+    const [inventory, setInventory] = useState([]); // State to hold inventory items
+    const [inventoryLoading, setInventoryLoading] = useState(false); // Loading state for inventory
 
-    // when we land on this page we'll prompt the LLM to start the game
+    // Fetch inventory and start the game on initial component load
     useEffect(() => {
+        // Fetch inventory items
+        const fetchInventory = async () => {
+            setInventoryLoading(true);
+            try {
+                const response = await fetch('/items');
+                if (!response.ok) {
+                    throw new Error('Failed to fetch inventory');
+                }
+                const items = await response.json();
+                setInventory(items);
+            } catch (error) {
+                console.error('Error fetching inventory:', error);
+            } finally {
+                setInventoryLoading(false);
+            }
+        };
+
+        fetchInventory();
+
+        // Start the game by prompting the LLM
         if (didStart.current) return;
         didStart.current = true;
         setLoading(true);
@@ -68,8 +89,6 @@ function ChatTestPage() {
         }
     };
 
-
-
     return (
         <div className="chat-page">
             <div className="chat-layout">
@@ -89,26 +108,22 @@ function ChatTestPage() {
                     <div className="inventory-container">
                         <h3 className="inventory-title">Inventory</h3>
                         <div className="inventory-list">
-                            <div className="inventory-item">
-                                <span className="item-emoji">💻</span>
-                                <span className="item-name">laptop</span>
-                            </div>
-                            <div className="inventory-item">
-                                <span className="item-emoji">☕</span>
-                                <span className="item-name">coffee</span>
-                            </div>
-                            <div className="inventory-item">
-                                <span className="item-emoji">⛽</span>
-                                <span className="item-name">gas</span>
-                            </div>
-                            <div className="inventory-item">
-                                <span className="item-emoji">💰</span>
-                                <span className="item-name">money</span>
-                            </div>
-                            <div className="inventory-item">
-                                <span className="item-emoji">🔮</span>
-                                <span className="item-name">macguffins</span>
-                            </div>
+                            {/* Display a loading message while fetching */}
+                            {inventoryLoading ? (
+                                <div className="loading-message">Loading inventory...</div>
+                            ) : inventory.length > 0 ? (
+                                // Map over the inventory array and render each item
+                                inventory.map((item, index) => (
+                                    <div key={index} className="inventory-item">
+                                        <span className="item-emoji">{item.emoji}</span>
+                                        <span className="item-name">{item.name}</span>
+                                        <span className="item-amount">{item.amount}</span>
+                                    </div>
+                                ))
+                            ) : (
+                                // Display a message if no items are found
+                                <div className="inventory-empty">Your inventory is empty.</div>
+                            )}
                         </div>
                     </div>
                 </div>

@@ -334,6 +334,15 @@ body {
   text-overflow: ellipsis;
 }
 
+.item-amount {
+  color: white;
+  font-size: 0.8rem;
+  font-weight: 400;
+  text-transform: capitalize;
+  white-space: nowrap;
+  text-align: right;
+}
+
 .chat-container {
   flex: 1;
   background: rgba(255, 255, 255, 0.1);
