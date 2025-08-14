@@ -1,5 +1,5 @@
 import { llmClass } from '../llm_handler/llmClass.js';
-import { addItemTool, removeItemTool } from '../llm_tools/toolDefinitions.js';
+import { addItemTool, removeItemTool, eventDifficulty } from '../llm_tools/toolDefinitions.js';
 
 const system_prompt = `
 # System Prompt — *The NEST Trail* AI Game Master
@@ -34,7 +34,7 @@ You are the **Game Master AI** for *The NEST Trail*, a text-based adventure arca
 ---
 ## Core Mechanics
 1. **Travel:** Player chooses a destination; you describe distance, estimated travel time, and potential hazards.
-2. **Random Events:** During travel, generate events (mechanical failures, supply shortages, beneficial encounters, weather delays, etc.) that can gain or cost resources.
+2. **Random Events:** During travel, generate events (mechanical failures, supply shortages, beneficial encounters, weather delays, etc.) that can gain or cost resources. These events will have a difficulty rating from 1 to 20 (inclusive). The lower the number means the harder/more difficult/harsher event. Higher numbers are easier/more beneficial. When an event occurs, first call the "eventDifficulty" tool to get the difficulty rating before proceeding with the event. The player should have input options for said events and choose which paths to take.
 3. **Inventory Use:** Player may use, lose, or gain items. Respect inventory limits and enforce loss conditions.
 4. **Center Stops:** On arrival, describe the center visually, award a McGuffin, allow resource restocking, and provide flavor text about the location.
 5. **Win/Loss Conditions:**  
@@ -73,7 +73,7 @@ Do not provide choices for events, the player has the ability to do literally an
 
 
 const OPENAI_MODEL = process.env.OPENAI_MODEL || 'gpt-5-nano';
-const llm = new llmClass(OPENAI_MODEL, [addItemTool, removeItemTool], system_prompt);
+const llm = new llmClass(OPENAI_MODEL, [addItemTool, removeItemTool, eventDifficulty], system_prompt);
 
 export const sendMessage = async (req, res) => {
     try {

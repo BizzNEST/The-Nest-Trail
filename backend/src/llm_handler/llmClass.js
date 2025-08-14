@@ -5,7 +5,7 @@ import { llmTool, llmToolProperty } from '../llm_tools/toolClass.js';
 dotenv.config();
 
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
-const OPENAI_MODEL = process.env.OPENAI_MODEL || 'gpt-5-nano';
+const OPENAI_MODEL = process.env.OPENAI_MODEL || 'gpt-4.1';
 
 if (!OPENAI_API_KEY) {
   console.error('Error: Missing OPENAI_API_KEY in environment');

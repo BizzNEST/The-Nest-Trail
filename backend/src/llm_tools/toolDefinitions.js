@@ -1,5 +1,6 @@
 import { llmTool, llmToolProperty } from './toolClass.js';
 import sharedInventory from '../../models/sharedInventory.js';
+import { getRandInt } from '../services/randomNum.js';
 
 const addItemTool = new llmTool(
     'addItem',
@@ -30,4 +31,16 @@ const removeItemTool = new llmTool(
     }
 );
 
-export { addItemTool, removeItemTool };
+const eventDifficulty = new llmTool(
+    'eventDifficulty',
+    'Gets difficulty of generated event',
+    {
+        modifier: new llmToolProperty('difficultyModifier', 'number', 'Positive or negative number to adjust difficulty', true)
+    },
+    (args) => {
+        const num = getRandInt();
+        return `The player rolled a ${num}.`;
+    }
+)
+
+export { addItemTool, removeItemTool, eventDifficulty };
