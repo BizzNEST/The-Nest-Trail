@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { sendMessage, startGame, fetchStats } from '../api/api';
+import { sendMessage, startGame, fetchStats, getInventory } from '../api/api';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import ChatBackground from '../components/ChatBackground';
@@ -10,45 +10,23 @@ function ChatTestPage() {
     const [loading, setLoading] = useState(false);
     const messagesEndRef = useRef(null);
     const didStart = useRef(false);
+    
     // game stats state
     const [stats, setStats] = useState({
         elapsedMinutes: 0,
         currentLocation: 'Loading...'
     });
     const [statsLoading, setStatsLoading] = useState(false);
-    // These variables are intentionally unused but kept for future implementation
-    // eslint-disable-next-line no-unused-vars
+    
+    // placeholder game stats state
+    const [inGameSeconds, setInGameSeconds] = useState(0);
+    const [macguffinsCount] = useState(3); // placeholder value
+    const [money, setMoney] = useState(null);
+    const [currentRoute] = useState({ from: 'Santa Cruz', to: 'Watsonville' }); // placeholder value
+    
     const [inventory, setInventory] = useState([]); // State to hold inventory items
     // eslint-disable-next-line no-unused-vars
     const [inventoryLoading, setInventoryLoading] = useState(false); // Loading state for inventory
-
-    const tempInventory = [
-        {
-            name: 'Laptop',
-            emoji: '💻',
-            amount: 1
-        },
-        {
-            name: 'Coffee', 
-            emoji: '☕',
-            amount: 5
-        },
-        {
-            name: 'Money',
-            emoji: '💰',
-            amount: 1000
-        },
-        {
-            name: 'Gas',
-            emoji: '🚗',
-            amount: 100
-        },
-        {
-            name: 'MacGuffins',
-            emoji: '🔮',
-            amount: 1
-        }
-    ]
 
     // Fetch stats from backend
     const fetchGameStats = async (showLoading = false) => {
@@ -67,29 +45,8 @@ function ChatTestPage() {
         }
     };
 
-    // Fetch inventory and start the game on initial component load
+    // Start the game on initial component load
     useEffect(() => {
-        // Fetch inventory items
-        const fetchInventory = async () => {
-            setInventoryLoading(true);
-            try {
-                const response = await fetch('/items');
-                if (!response.ok) {
-                    throw new Error('Failed to fetch inventory');
-                }
-                const items = await response.json();
-                console.log(items);
-                setInventory(tempInventory);
-            } catch (error) {
-                console.error('Error fetching inventory:', error);
-            } finally {
-                setInventoryLoading(false);
-            }
-        };
-
-        fetchInventory();
-        fetchGameStats(true);
-
         // Start the game by prompting the LLM
         if (didStart.current) return;
         didStart.current = true;
@@ -108,6 +65,32 @@ function ChatTestPage() {
             }
         }
         start();
+    }, []);
+
+    // fetch inventory items and update state everytime inventory changes
+    useEffect(() => {
+        let firstLoad = true;
+        // Fetch inventory items
+        const fetchInventory = async () => {
+            if (firstLoad) setInventoryLoading(true);
+            try {
+                const response = await getInventory();
+                const items = response.items;
+                setInventory(items);
+                setMoney(response.money);
+            } catch (error) {
+                console.error('Error fetching inventory:', error);
+            } finally {
+                if (firstLoad) {
+                    setInventoryLoading(false);
+                    firstLoad = false;
+                }
+            }
+        };
+        fetchInventory();
+        // refresh every few seconds to keep inventory updated
+        const intervalId = setInterval(fetchInventory, 5000);
+        return () => clearInterval(intervalId);
     }, []);
 
     // Periodically fetch stats to keep them updated
@@ -190,36 +173,28 @@ function ChatTestPage() {
                     <div className="inventory-container inventory-container--tall">
                         <h3 className="inventory-title">Inventory</h3>
                         <div className="inventory-list">
-                           {/* Display a loading message while fetching */}
-                           {
-                                tempInventory.map((item, index) => (
+                            <div className="inventory-item">
+                                <div className="item-name-container">
+                                    <span className="item-emoji">💰</span>
+                                    <span className="item-name">Money</span>
+                                </div>
+                                <span className="item-amount">{money}</span>
+                            </div>
+                            {inventoryLoading ? (
+                                <div className="inventory-loading">Loading inventory...</div>
+                            ) : inventory.length > 0 ? (
+                                inventory.map((item, index) => (
                                     <div key={index} className="inventory-item">
                                         <div className="item-name-container">
-                                            <span className="item-emoji">{item.emoji}</span>
+                                            <span className="item-emoji">{item.emoji || '📦'}</span>
                                             <span className="item-name">{item.name}</span>
                                         </div>
-                                        <span className="item-amount">{item.amount}</span>
+                                        <span className="item-amount">{item.count}</span>
                                     </div>
                                 ))
-                            }
-                        </div>
-                    </div>
-                    
-                    <div className="inventory-container inventory-container--tall">
-                        <h3 className="inventory-title">Inventory</h3>
-                        <div className="inventory-list">
-                            {/* Display a loading message while fetching */}
-                            {
-                                tempInventory.map((item, index) => (
-                                    <div key={index} className="inventory-item">
-                                        <div className="item-name-container">
-                                            <span className="item-emoji">{item.emoji}</span>
-                                            <span className="item-name">{item.name}</span>
-                                        </div>
-                                        <span className="item-amount">{item.amount}</span>
-                                    </div>
-                                ))
-                            }
+                            ) : (
+                                <div className="inventory-empty">No items in inventory</div>
+                            )}
                         </div>
                     </div>
                 </div>

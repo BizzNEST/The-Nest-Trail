@@ -75,3 +75,20 @@ export const fetchStats = async () => {
         throw error;
     }
 }
+
+// api call to get inventory items
+export const getInventory = async () => {
+    try {
+        const response = await fetch(`${API_URL}/api/items`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        });
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error('Error fetching inventory:', error);
+        throw error;
+    }
+}
