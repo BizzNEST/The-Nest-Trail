@@ -44,6 +44,8 @@ body {
   background-position: center;
   background-repeat: no-repeat;
   background-attachment: fixed;
+  position: relative;
+  overflow: hidden;
 }
 
 .hero-section {
@@ -192,23 +194,147 @@ body {
 /* Chat Page - Apple Liquid Glass Styles */
 .chat-page {
   min-height: 100vh;
-  background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url('./assets/welcome-banner2.jpeg');
+  background: transparent;
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
   background-attachment: fixed;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
-  padding: 2rem;
+  padding: 0 2rem 2rem;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Force all text within the chat page to be black */
+.chat-page, .chat-page * {
+  color: #000 !important;
+}
+
+/* Animated background container */
+.chat-background {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.chat-bg-layer {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, #85cbea 0%, #f6d6ae 60%, #ffdd65 100%);
+  background-size: cover;
+}
+
+.chat-car {
+  position: absolute;
+  bottom: 12px;
+  right: calc(16% - 50px);
+  width: 140px;
+  height: auto;
+  filter: drop-shadow(0 6px 12px rgba(0,0,0,0.35));
+  animation: carBob 3s ease-in-out infinite;
+  z-index: 2;
+}
+
+@keyframes gradientShift { 0% { background-position: 50% 0%; } 50% { background-position: 50% 100%; } 100% { background-position: 50% 0%; } }
+@keyframes carBob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-3px); } }
+
+/* Ground (road band) */
+.chat-ground {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 8rem;
+  background: linear-gradient(to bottom, #e1c766 0%, #dbc332 100%);
+  z-index: 0;
+}
+
+/* Road center stripe (subtle) */
+.chat-road-stripe {
+  position: absolute;
+  bottom: 2.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 2px;
+  height: 4rem;
+  background: rgba(234, 179, 8, 0.7);
+  filter: blur(0.2px);
+  opacity: 0.6;
+}
+
+/* Rocks scroll right to left */
+.chat-rock { position: absolute; bottom: 18px; background: #4b5563; opacity: 0.6; border-radius: 6px; z-index: 1; }
+.chat-rock.r1 { width: 20px; height: 14px; animation: scroll-right 32s linear infinite; left: -5%; }
+.chat-rock.r2 { width: 14px; height: 10px; animation: scroll-right 48s linear infinite; left: -3%; opacity: 0.5; }
+.chat-rock.r3 { width: 24px; height: 16px; animation: scroll-right 40s linear infinite; left: -8%; opacity: 0.4; }
+.chat-rock.r4 { width: 10px; height: 10px; animation: scroll-right 60s linear infinite; left: -2%; opacity: 0.7; }
+
+@keyframes scroll-right { 0% { transform: translateX(-100px); } 100% { transform: translateX(calc(100vw + 100px)); } }
+
+/* Trees scroll right to left */
+.chat-tree { position: absolute; bottom: 8rem; width: 48px; height: 72px; }
+.chat-tree .trunk { position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); width: 6px; height: 40px; background: #92400e; border-radius: 2px; }
+.chat-tree .canopy { position: absolute; bottom: 36px; left: 50%; transform: translateX(-50%); width: 36px; height: 36px; background: #16a34a; border-radius: 9999px; opacity: 0.8; }
+.chat-tree.t1 { left: -10%; animation: scroll-right 24s linear infinite; }
+.chat-tree.t1 .trunk { height: 48px; }
+.chat-tree.t2 { left: -5%; animation: scroll-right 36s linear infinite; opacity: 0.9; }
+.chat-tree.t2 .trunk { height: 36px; }
+.chat-tree.t2 .canopy { width: 28px; height: 28px; bottom: 32px; }
+.chat-tree.t3 { left: -15%; animation: scroll-right 44s linear infinite; opacity: 0.7; }
+.chat-tree.t3 .trunk { height: 64px; }
+.chat-tree.t3 .canopy { width: 44px; height: 44px; bottom: 56px; }
+
+/* Clouds and sun */
+.chat-cloud { position: absolute; background: rgba(255,255,255,0.5); border-radius: 9999px; animation: cloudPulse 6s ease-in-out infinite; }
+.chat-cloud.c1 { top: 10%; left: 10%; width: 64px; height: 32px; }
+.chat-cloud.c2 { top: 16%; right: 20%; width: 80px; height: 40px; animation-delay: 1s; opacity: 0.4; }
+.chat-cloud.c3 { top: 8%; left: 45%; width: 48px; height: 24px; animation-delay: 0.5s; opacity: 0.45; }
+.chat-sun { position: absolute; top: 12%; right: 12%; width: 48px; height: 48px; background: #facc15; border-radius: 9999px; opacity: 0.5; animation: cloudPulse 8s ease-in-out infinite; }
+
+@keyframes cloudPulse { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+
+/* Mountains */
+.chat-mountains { position: absolute; left: 0; right: 0; bottom: 8rem; height: 5rem; }
+.chat-mountains .m { position: absolute; bottom: 0; opacity: 0.2; }
+.chat-mountains .m1 { left: 0; width: 8rem; height: 4rem; background: #a78bfa; transform: skewX(12deg); }
+.chat-mountains .m2 { left: 5rem; width: 10rem; height: 5rem; background: #c4b5fd; transform: skewX(-6deg); opacity: 0.15; }
+.chat-mountains .m3 { right: 0; width: 9rem; height: 3.5rem; background: #a78bfa; transform: skewX(6deg); }
+
+/* Dust particles drifting from car to the right */
+.chat-dust { position: absolute; bottom: 30px; right: calc(14% - 210px); width: 240px; height: 80px; z-index: 100; }
+.chat-dust .p { position: absolute; border-radius: 9999px; }
+.chat-dust .p1 { left: 0; bottom: 6px; width: 8px; height: 8px; background: #f59e0b; opacity: 0.45; animation: drift-right 1.6s ease-out infinite; }
+.chat-dust .p2 { left: 8px; bottom: 2px; width: 12px; height: 12px; background: #fb923c; opacity: 0.4; animation: drift-right 1.8s ease-out infinite; }
+.chat-dust .p3 { left: 14px; bottom: 10px; width: 16px; height: 16px; background: #fbbf24; opacity: 0.38; animation: drift-right 2.1s ease-out infinite; }
+.chat-dust .p4 { left: 22px; bottom: 4px; width: 10px; height: 10px; background: #f59e0b; opacity: 0.42; animation: drift-right 2.4s ease-out infinite; }
+.chat-dust .p5 { left: 30px; bottom: 12px; width: 18px; height: 18px; background: #f59e0b; opacity: 0.36; animation: drift-right 2.7s ease-out infinite; }
+.chat-dust .p6 { left: 40px; bottom: 8px; width: 9px; height: 9px; background: #fb923c; opacity: 0.38; animation: drift-right 3s ease-out infinite; }
+.chat-dust .p7 { left: 52px; bottom: 14px; width: 20px; height: 20px; background: #fde68a; opacity: 0.32; animation: drift-right 3.3s ease-out infinite; }
+.chat-dust .p8 { left: 66px; bottom: 10px; width: 14px; height: 14px; background: #fbbf24; opacity: 0.34; animation: drift-right 3.6s ease-out infinite; }
+.chat-dust .p9 { left: 82px; bottom: 6px; width: 24px; height: 24px; background: #fb923c; opacity: 0.28; animation: drift-right 3.9s ease-out infinite; }
+.chat-dust .p10 { left: 100px; bottom: 12px; width: 12px; height: 12px; background: #fde68a; opacity: 0.3; animation: drift-right 4.2s ease-out infinite; }
+.chat-dust .p11 { left: 120px; bottom: 8px; width: 20px; height: 20px; background: #fbbf24; opacity: 0.26; animation: drift-right 4.5s ease-out infinite; }
+.chat-dust .p12 { left: 140px; bottom: 14px; width: 15px; height: 15px; background: #f59e0b; opacity: 0.26; animation: drift-right 4.8s ease-out infinite; }
+.chat-dust .p13 { left: 160px; bottom: 10px; width: 22px; height: 22px; background: #fb923c; opacity: 0.24; animation: drift-right 5.1s ease-out infinite; }
+.chat-dust .p14 { left: 180px; bottom: 8px; width: 18px; height: 18px; background: #f59e0b; opacity: 0.22; animation: drift-right 5.4s ease-out infinite; }
+
+@keyframes drift-right {
+  0% { transform: translateX(0) translateY(0) scale(1); opacity: 0.9; }
+  30% { transform: translateX(25px) translateY(-3px) scale(1.15); opacity: 0.6; }
+  60% { transform: translateX(55px) translateY(2px) scale(0.95); opacity: 0.35; }
+  100% { transform: translateX(90px) translateY(-2px) scale(0.8); opacity: 0; }
 }
 
 .chat-layout {
   display: flex;
   width: 100%;
   max-width: 1400px;
-  height: 700px;
+  height: 650px;
   gap: 2rem;
+  margin-top: 50px;
 }
 
 .map-column {

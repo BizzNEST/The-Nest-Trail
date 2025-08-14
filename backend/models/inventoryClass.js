@@ -93,6 +93,10 @@ class Inventory {
     this.money -= amount;
     return this.money;
   }
+
+  getMoney() {
+    return this.money;
+  }
 }
 
 export { Inventory, Item };

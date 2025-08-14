@@ -68,12 +68,12 @@ const removeMoneyTool = new llmTool(
 );
 
 // Simple read tools so the AI can inspect state before/after actions
-// const getMoneyTool = new llmTool(
-//   'getMoney',
-//   'Returns the player\'s current money amount.',
-//   {},
-//   () => ({ money: sharedInventory.getMoney() })
-// );
+const getMoneyTool = new llmTool(
+  'getMoney',
+  'Returns the player\'s current money amount.',
+  {},
+  () => ({ money: sharedInventory.getMoney() })
+);
 
 const listInventoryTool = new llmTool(
   'listInventory',
@@ -128,7 +128,6 @@ const getDistanceAndEventCountTool = new llmTool(
     }
 );
 
-export { addItemTool, removeItemTool, getAllItemsTool, getPossiblePathsTool, getDistanceAndEventCountTool };
 const eventDifficulty = new llmTool(
     'eventDifficulty',
     'Gets difficulty of generated event',
@@ -141,5 +140,4 @@ const eventDifficulty = new llmTool(
     }
 )
 
-export { addItemTool, removeItemTool, eventDifficulty, addMoneyTool, removeMoneyTool, listInventoryTool };
-
+export { addItemTool, removeItemTool, getAllItemsTool, getPossiblePathsTool, getDistanceAndEventCountTool, eventDifficulty, addMoneyTool, removeMoneyTool, listInventoryTool, getMoneyTool };
