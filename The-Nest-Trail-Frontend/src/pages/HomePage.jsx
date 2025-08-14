@@ -10,9 +10,24 @@ function HomePage() {
     }, [data]);
 
     return (
-        <div>
-            <h1>Welcome to the Nest Trail</h1>
-            <Link to="/chat-test">Chat</Link>
+        <div className="homepage">
+            <div className="hero-section">
+                <div className="container">
+                    <h1 className="main-title">
+                        Welcome to
+                        <span className="brand-name"> The <span className="nest-highlight">NEST</span> Trail</span>
+                    </h1>
+                    <p className="subtitle">
+                        Congratulations on becoming a new BizzNEST intern! <br />
+                        Will you get through The NEST Trail?
+                    </p>
+                    
+                    <Link to="/chat-test" className="cta-button">
+                        Start the Trail
+                        <span className="arrow">→</span>
+                    </Link>
+                </div>
+            </div>
         </div>
     )
 }
