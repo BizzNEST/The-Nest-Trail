@@ -10,6 +10,10 @@ function ChatTestPage() {
     const messagesEndRef = useRef(null);
     // if we prompted make sure we use a flag to prevent double invoking due to React.StrictMode
     const didStart = useRef(false);
+    // placeholder game stats state
+    const [inGameSeconds, setInGameSeconds] = useState(0);
+    const [macguffinsCount] = useState(3); // placeholder value
+    const [currentRoute] = useState({ from: 'Santa Cruz', to: 'Watsonville' }); // placeholder value
 
     // when we land on this page we'll prompt the LLM to start the game
     useEffect(() => {
@@ -31,6 +35,22 @@ function ChatTestPage() {
         }
         start();
     }, []);
+
+    // increment in-game time every second (placeholder timer)
+    useEffect(() => {
+        const intervalId = setInterval(() => {
+            setInGameSeconds((prev) => prev + 1);
+        }, 1000);
+        return () => clearInterval(intervalId);
+    }, []);
+
+    const formatTime = (totalSeconds) => {
+        const hours = Math.floor(totalSeconds / 3600);
+        const minutes = Math.floor((totalSeconds % 3600) / 60);
+        const seconds = totalSeconds % 60;
+        const pad = (n) => String(n).padStart(2, '0');
+        return `${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
+    };
 
     const handleSend = async () => {
         if (!input.trim()) return;
@@ -75,18 +95,25 @@ function ChatTestPage() {
             <div className="chat-layout">
                 {/* Left Column - Map and Inventory */}
                 <div className="map-column">
-                    <div className="map-container">
-                        <h3 className="map-title">Your Location</h3>
-                        <div className="map-placeholder">
-                            <div className="placeholder-content">
-                                <div className="placeholder-icon">📍</div>
-                                <p>Map placeholder</p>
-                                <p className="placeholder-subtitle">Location tracking will appear here</p>
+                    <div className="map-container stats-container">
+                        <h3 className="map-title">Game Stats</h3>
+                        <div className="inventory-list">
+                            <div className="inventory-item">
+                                <span className="item-emoji">⏱️</span>
+                                <span className="item-name">Time Elapsed — {formatTime(inGameSeconds)}</span>
+                            </div>
+                            <div className="inventory-item">
+                                <span className="item-emoji">🔮</span>
+                                <span className="item-name">MacGuffins — {macguffinsCount} / 5</span>
+                            </div>
+                            <div className="inventory-item">
+                                <span className="item-emoji">🧭</span>
+                                <span className="item-name">Current Route — {currentRoute.from} → {currentRoute.to}</span>
                             </div>
                         </div>
                     </div>
                     
-                    <div className="inventory-container">
+                    <div className="inventory-container inventory-container--tall">
                         <h3 className="inventory-title">Inventory</h3>
                         <div className="inventory-list">
                             <div className="inventory-item">
