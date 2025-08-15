@@ -4,7 +4,7 @@ import ChatTestPage from './pages/ChatTestPage';
 
 function App() {
   return (
-    <Router>
+    <Router basename={import.meta.env.BASE_URL}>
       <Routes>
         <Route path="/" element={<HomePage/>} />
         <Route path="/chat-test" element={<ChatTestPage/>} />
