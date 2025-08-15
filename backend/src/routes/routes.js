@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { getLeaderboard } from '../controllers/routeFinder.js';
 import { sendMessage } from './llmApi.js';
 import sharedInventory from '../../models/sharedInventory.js';
-
+import sharedStats from '../../models/sharedStats.js';
 
 const router = Router();
 
@@ -29,6 +29,16 @@ router.get('/api/items', (req, res) => {
   } catch (error) {
       console.error('Error fetching items:', error.message);
       res.status(500).json({ error: 'Failed to fetch items' });
+  }
+});
+
+router.get('/api/stats', (req, res) => {
+  try {
+      const stats = sharedStats.getStats();
+      res.status(200).json(stats);
+  } catch (error) {
+      console.error('Error fetching stats:', error.message);
+      res.status(500).json({ error: 'Failed to fetch stats' });
   }
 });
 

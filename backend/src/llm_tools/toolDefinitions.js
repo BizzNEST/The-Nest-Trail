@@ -1,5 +1,6 @@
 import { llmTool, llmToolProperty } from './toolClass.js';
 import sharedInventory from '../../models/sharedInventory.js';
+import sharedStats from '../../models/sharedStats.js';
 import { getRandInt } from '../services/randomNum.js';
 import { getPossiblePaths, getDistanceAndEventCount } from '../controllers/routeFinder.js';
 
@@ -128,16 +129,54 @@ const getDistanceAndEventCountTool = new llmTool(
     }
 );
 
+
+const GAME_DIFFICULTY_MODIFIER = 0 // this is a global modifier to the difficulty of the game
 const eventDifficulty = new llmTool(
-    'eventDifficulty',
-    'Gets difficulty of generated event',
+    'rollDice',
+    'Rolls a d20 for an event, a player action, or anything that could be somewhat random.  A 20 is good, a 1 is very bad.',
     {
-        modifier: new llmToolProperty('difficultyModifier', 'number', 'Positive or negative number to adjust difficulty', true)
+        modifier: new llmToolProperty('difficultyModifier', 'number', 'Positive or negative modifier to the roll', true)
     },
     (args) => {
+        const { modifier } = args;
         const num = getRandInt();
-        return `The player rolled a ${num}.`;
+        console.log("eventDifficulty: " + (num + modifier + GAME_DIFFICULTY_MODIFIER))
+        if (modifier != 0 && GAME_DIFFICULTY_MODIFIER != 0) {
+            return `The player rolled a ${num}.  With the modifier of ${modifier} and the global difficulty modifier of ${GAME_DIFFICULTY_MODIFIER}, the result is ${num + modifier + GAME_DIFFICULTY_MODIFIER}. The outcome of whatever you were rolling for should be based on this.`;
+        } else if (modifier != 0) {
+            return `The player rolled a ${num}.  With the modifier of ${modifier}, the result is ${num + modifier}. The outcome of whatever you were rolling for should be based on this.`;
+        } else if (GAME_DIFFICULTY_MODIFIER != 0) {
+            return `The player rolled a ${num}.  With the global difficulty modifier of ${GAME_DIFFICULTY_MODIFIER}, the result is ${num + GAME_DIFFICULTY_MODIFIER}. The outcome of whatever you were rolling for should be based on this.`;
+        } else {
+            return `The player rolled a ${num}.  The outcome of whatever you were rolling for should be based on this.`;
+        }
     }
 )
 
-export { addItemTool, removeItemTool, getAllItemsTool, getPossiblePathsTool, getDistanceAndEventCountTool, eventDifficulty, addMoneyTool, removeMoneyTool, listInventoryTool, getMoneyTool };
+// Stats tools
+const getStatsTool = new llmTool(
+    'getStats',
+    'Gets the current game stats including elapsed time and current location',
+    {},
+    (args) => {
+        const stats = sharedStats.getStats();
+        return `Current game stats:\n- Time elapsed: ${stats.elapsedMinutes} minutes\n- Current location: ${stats.currentLocation}`;
+    }
+);
+
+const updateStatsTool = new llmTool(
+    'updateStats',
+    'Updates the game stats with new time elapsed, location, and optional distance traveled.  This should be called every time before you respond to the player.',
+    {
+        timeElapsed: new llmToolProperty('timeElapsed', 'number', 'Number of minutes to add to elapsed time.  Whatever you deem fit, but assume the player generally travels at 60mph (or one mile per minute) when on the road.', true),
+        location: new llmToolProperty('location', 'string', 'New current location. Either a center or between centers.', true),
+        distanceTraveled: new llmToolProperty('distanceTraveled', 'number', 'Distance traveled in miles (0 if no travel)', true)
+    },
+    (args) => {
+        const { timeElapsed, location, distanceTraveled = 0 } = args;
+        const result = sharedStats.updateStatus(timeElapsed, location, distanceTraveled);
+        return result;
+    }
+);
+
+export { addItemTool, removeItemTool, getAllItemsTool, getPossiblePathsTool, getDistanceAndEventCountTool, eventDifficulty, addMoneyTool, removeMoneyTool, listInventoryTool, getMoneyTool, getStatsTool, updateStatsTool };
