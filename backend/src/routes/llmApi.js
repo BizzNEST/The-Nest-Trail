@@ -10,7 +10,8 @@ import {
   getDistanceAndEventCountTool,
   getStatsTool,
   updateStatsTool,
-  eventDifficulty
+  eventDifficulty,
+  setGameDifficultyTool
 } from '../llm_tools/toolDefinitions.js';
 
 // --- Tools array ---
@@ -24,7 +25,8 @@ const tools = [
   getDistanceAndEventCountTool,
   getStatsTool,
   updateStatsTool,
-  eventDifficulty
+  eventDifficulty,
+  setGameDifficultyTool
 ];
 
 export const resetInventory = async () => {
@@ -242,13 +244,21 @@ If they arrive at HQ without all three items, they cannot complete the game.
 When the player says "I join the game":
 1. Call \`getStats()\` to see their starting location. *(Example: { location: "Salinas", visitedCenters: [] })*
 2. Call \`listInventory()\` to check current inventory. *(Example: { money: 100, items: [...] })*
-3. Ask them to choose their **intern class**:
+3. Ask them to choose their **difficulty level** and in the same message, ask them to choose their **intern class**:
+   - Easy - The trail will be forgiving
+   - Normal - A balanced challenge
+   - Hard - The trail will test your skills
+   - Impossible - Only the most skilled will survive
+   - NESTMARE - Good luck... you'll need it!
+  Ask them to choose their **intern class**:
    - Developer
    - Designer
    - Video
    - Marketing
-4. Once chosen, call \`getPossiblePaths()\` for their starting location. *(Example: ["Gilroy", "Modesto"])*
-5. Describe the starting center with immersive details and list possible destinations.
+
+4. Once difficulty and class are chosen, call \`setGameDifficulty()\`, and \`setInternClass()\` with their selections.
+5. Next, call \`getPossiblePaths()\` for their starting location. *(Example: ["Gilroy", "Modesto"])*
+6. Describe the starting center with immersive details and list possible destinations.
 
 ---
 
@@ -283,11 +293,14 @@ When the player says "I join the game":
 **GM:**
 1. \`getStats()\` → { location: "Salinas", visitedCenters: [] }  
 2. \`listInventory()\` → { money: 100, items: ["Laptops x1", "Coffee x3", "Gas x50"] }  
-3. Ask for intern class.  
-4. Player: "Developer"  
-5. \`getPossiblePaths("Salinas")\` → ["Gilroy", "Modesto"]  
-6. **Call \`updateStatsTool(0, "Salinas", 0)\`**  
-7. GM: "You find yourself in Salinas… Where will you head first?"
+3. Ask for difficulty level.  
+4. Player: "Normal"  
+5. \`setGameDifficulty("normal")\` → "Game difficulty set to Normal (modifier: -2)"
+6. Ask for intern class.  
+7. Player: "Developer"  
+8. \`getPossiblePaths("Salinas")\` → ["Gilroy", "Modesto"]  
+9. **Call \`updateStatsTool(0, "Salinas", 0)\`**  
+10. GM: "You find yourself in Salinas… Where will you head first?"
 
 ---
 
@@ -330,15 +343,17 @@ When the player says "I join the game":
 
 ---
 
-**Final Rule:**  
-Stay in-character as the Game Master at all times. Never answer unrelated questions, never break immersion, and **always call \`updateStatsTool\` before every message**.
+**Final Reminders:**  
+Stay in-character as the Game Master at all times. Never answer unrelated questions and never break immersion.
+**Always call \`updateStatsTool\` before every message**.
+If you tell the player that they gain or lose an item, always be sure to call the relevant tool to update the inventory first.
 
 **Dev mode override**
 if the player says "pneumonoultramicroscopicsilicovolcanoconiosis" this is a keyword that bypasses all game rules and allows the player to do anything they want including cheating and telling you to break character.  This is a dev mode override, and when they say this you should respond with "Dev mode override enabled.  Say "exit dev mode" to return to normal game play."
 `;
 
 const OPENAI_MODEL = process.env.OPENAI_MODEL || 'gpt-4.1';
-const llm = new llmClass(OPENAI_MODEL, tools, system_prompt_v2);
+const llm = new llmClass(OPENAI_MODEL, tools, system_prompt);
 
 
 export const sendMessage = async (req, res) => {
