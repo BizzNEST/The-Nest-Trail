@@ -92,3 +92,16 @@ export const getInventory = async () => {
         throw error;
     }
 }
+
+// reset game api call
+export const resetGame = async () => {
+    try {
+        const response = await fetch(`${API_URL}/api/reset`, { 
+            method: 'POST' 
+        });
+        return response.ok;
+    } catch (error) {
+        console.error('Error resetting game:', error);
+        throw error;
+    }
+}
