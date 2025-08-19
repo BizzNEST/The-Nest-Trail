@@ -20,7 +20,7 @@ sharedInventory.setMoney(100); // <-- Using Inventory.setMoney
 
 sharedInventory.addItem('Laptops', 'Portable computers for work', 1);
 sharedInventory.addItem('Coffee', 'Hot caffeinated beverage', 3);
-sharedInventory.addItem('Gas', 'Fuel for travel', 50);
+sharedInventory.addItem('Gas', 'Fuel for travel', 15);
 sharedInventory.addItem('Spare Tires', 'Tires for replacing damaged ones', 1);
 sharedInventory.addItem('Laptop Chargers', 'Chargers for laptops', 1);
 
