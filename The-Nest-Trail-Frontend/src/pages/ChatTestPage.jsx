@@ -245,7 +245,7 @@ function ChatTestPage() {
         }
         
         if (!lastUpdateStats) {
-            return { type: 'animated', showDust: true }; // Default state
+            return { type: 'static', showDust: false }; // Default to static welcome image on page load
         }
 
         const { location, distanceTraveled } = lastUpdateStats;
