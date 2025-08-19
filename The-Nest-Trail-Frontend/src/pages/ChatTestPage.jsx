@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { sendMessage, startGame, fetchStats, getInventory } from '../api/api';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -36,6 +36,26 @@ function ChatTestPage() {
     const [inventory, setInventory] = useState([]); // State to hold inventory items
     // eslint-disable-next-line no-unused-vars
     const [inventoryLoading, setInventoryLoading] = useState(false); // Loading state for inventory
+
+    // Memoize ReactMarkdown components to prevent recreation on every render
+    const markdownComponents = useMemo(() => ({
+        code: ({ inline, children, ...props }) =>
+            inline ? (
+                <code className="inline-code" {...props}>{children}</code>
+            ) : (
+                <pre className="code-block"><code {...props}>{children}</code></pre>
+            ),
+        h1: ({ children }) => <h1 className="markdown-h1">{children}</h1>,
+        h2: ({ children }) => <h2 className="markdown-h2">{children}</h2>,
+        h3: ({ children }) => <h3 className="markdown-h3">{children}</h3>,
+        ul: ({ children }) => <ul className="markdown-ul">{children}</ul>,
+        ol: ({ children }) => <ol className="markdown-ol">{children}</ol>,
+        p: ({ children }) => <p className="markdown-p">{children}</p>,
+        blockquote: ({ children }) => <blockquote className="markdown-blockquote">{children}</blockquote>,
+        table: ({ children }) => <table className="markdown-table">{children}</table>,
+        th: ({ children }) => <th className="markdown-th">{children}</th>,
+        td: ({ children }) => <td className="markdown-td">{children}</td>,
+    }), []);
 
     // Fetch stats from backend
     const fetchGameStats = async (showLoading = false) => {
@@ -232,51 +252,7 @@ function ChatTestPage() {
                                         {msg.sender === 'bot' ? (
                                             <ReactMarkdown 
                                                 remarkPlugins={[remarkGfm]}
-                                                components={{
-                                                    // Style code blocks
-                                                    code: ({inline, children, ...props}) => {
-                                                        return inline ? (
-                                                            <code className="inline-code" {...props}>
-                                                                {children}
-                                                            </code>
-                                                        ) : (
-                                                            <pre className="code-block">
-                                                                <code {...props}>{children}</code>
-                                                            </pre>
-                                                        );
-                                                    },
-                                                    // Style headings
-                                                    h1: ({children}) => <h1 className="markdown-h1">{children}</h1>,
-                                                    h2: ({children}) => <h2 className="markdown-h2">{children}</h2>,
-                                                    h3: ({children}) => <h3 className="markdown-h3">{children}</h3>,
-                                                    // Style lists
-                                                    ul: ({children}) => <ul className="markdown-ul">{children}</ul>,
-                                                    ol: ({children}) => <ol className="markdown-ol">{children}</ol>,
-                                                    // Style paragraphs
-                                                    p: ({children}) => <p className="markdown-p">{children}</p>,
-                                                    // Style blockquotes
-                                                    blockquote: ({children}) => (
-                                                        <blockquote className="markdown-blockquote">
-                                                            {children}
-                                                        </blockquote>
-                                                    ),
-                                                    // Style tables
-                                                    table: ({children}) => (
-                                                        <table className="markdown-table">
-                                                            {children}
-                                                        </table>
-                                                    ),
-                                                    th: ({children}) => (
-                                                        <th className="markdown-th">
-                                                            {children}
-                                                        </th>
-                                                    ),
-                                                    td: ({children}) => (
-                                                        <td className="markdown-td">
-                                                            {children}
-                                                        </td>
-                                                    ),
-                                                }}
+                                                components={markdownComponents}
                                             >
                                                 {msg.text}
                                             </ReactMarkdown>
