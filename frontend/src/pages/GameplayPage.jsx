@@ -13,7 +13,7 @@ const emojiMap = {
   "Money": "💰"
 };
 
-function ChatTestPage() {
+function GameplayPage() {
     const [messages, setMessages] = useState([]);
     const [input, setInput] = useState('');
     const [loading, setLoading] = useState(false);
@@ -326,4 +326,4 @@ function ChatTestPage() {
     );
 }
 
-export default ChatTestPage;
+export default GameplayPage;
