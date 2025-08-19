@@ -165,20 +165,20 @@ const setGameDifficultyTool = new llmTool(
         
         switch (difficultyLower) {
             case 'easy':
-                GAME_DIFFICULTY_MODIFIER = 0;
-                return 'Game difficulty set to Easy (modifier: 0). The trail will be forgiving!';
+                GAME_DIFFICULTY_MODIFIER = 2;
+                return 'Game difficulty set to Easy (modifier: 2). The trail will be forgiving!';
             case 'normal':
-                GAME_DIFFICULTY_MODIFIER = -2;
-                return 'Game difficulty set to Normal (modifier: -2). A balanced challenge awaits.';
+                GAME_DIFFICULTY_MODIFIER = 0;
+                return 'Game difficulty set to Normal (modifier: 0). A balanced challenge awaits.';
             case 'hard':
-                GAME_DIFFICULTY_MODIFIER = -4;
+                GAME_DIFFICULTY_MODIFIER = -2;
                 return 'Game difficulty set to Hard (modifier: -4). The trail will test your skills!';
             case 'impossible':
-                GAME_DIFFICULTY_MODIFIER = -6;
-                return 'Game difficulty set to Impossible (modifier: -6). Only the most skilled will survive!';
+                GAME_DIFFICULTY_MODIFIER = -4;
+                return 'Game difficulty set to Impossible (modifier: -4). Only the most skilled will survive!';
             case 'nestmare':
-                GAME_DIFFICULTY_MODIFIER = -10;
-                return 'Game difficulty set to NESTMARE (modifier: -10). Good luck... you\'ll need it!';
+                GAME_DIFFICULTY_MODIFIER = -6;
+                return 'Game difficulty set to NESTMARE (modifier: -6)';
             default:
                 throw new Error('Invalid difficulty level. Choose: easy, normal, hard, impossible, or nestmare');
         }

@@ -104,11 +104,11 @@ When the player says "I join the game":
 1. Call \`getStats()\` to see their starting location. *(Example: { location: "Salinas", visitedCenters: [] })*
 2. Call \`listInventory()\` to check current inventory. *(Example: { money: 100, items: [...] })*
 3. Ask them to choose their **difficulty level** and in the same message, ask them to choose their **intern class**:
-   - Easy (luck modifier: +2) - The trail will be forgiving
-   - Normal (luck modifier: 0) - A balanced challenge
-   - Hard (luck modifier: -2) - The trail will test your skills
-   - Impossible (luck modifier: -4) - Only the most skilled will survive
-   - NESTMARE (luck modifier: -6) - Good luck... you'll need it!
+   - Easy - The trail will be forgiving
+   - Normal - A balanced challenge
+   - Hard - The trail will test your skills
+   - Impossible - Only the most skilled will survive
+   - NESTMARE - Good luck... you'll need it!
   Ask them to choose their **intern class**:
    - Developer
    - Designer
