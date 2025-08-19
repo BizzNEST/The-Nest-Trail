@@ -130,7 +130,7 @@ const getDistanceAndEventCountTool = new llmTool(
 );
 
 
-const GAME_DIFFICULTY_MODIFIER = 0 // this is a global modifier to the difficulty of the game
+let GAME_DIFFICULTY_MODIFIER = 0 // this is a global modifier to the difficulty of the game
 const eventDifficulty = new llmTool(
     'rollDice',
     'Rolls a d20 for an event, a player action, or anything that could be somewhat random.  A 20 is good, a 1 is very bad.',
@@ -149,6 +149,38 @@ const eventDifficulty = new llmTool(
             return `The player rolled a ${num}.  With the global difficulty modifier of ${GAME_DIFFICULTY_MODIFIER}, the result is ${num + GAME_DIFFICULTY_MODIFIER}. The outcome of whatever you were rolling for should be based on this.`;
         } else {
             return `The player rolled a ${num}.  The outcome of whatever you were rolling for should be based on this.`;
+        }
+    }
+)
+
+const setGameDifficultyTool = new llmTool(
+    'setGameDifficulty',
+    'Sets the global game difficulty modifier. Easy = 0, Normal = -2, Hard = -4, Impossible = -6, NESTMARE = -10.',
+    {
+        difficulty: new llmToolProperty('difficulty', 'string', 'Difficulty level: "easy", "normal", "hard", "impossible", or "nestmare"', true)
+    },
+    (args) => {
+        const { difficulty } = args;
+        const difficultyLower = difficulty.toLowerCase();
+        
+        switch (difficultyLower) {
+            case 'easy':
+                GAME_DIFFICULTY_MODIFIER = 0;
+                return 'Game difficulty set to Easy (modifier: 0). The trail will be forgiving!';
+            case 'normal':
+                GAME_DIFFICULTY_MODIFIER = -2;
+                return 'Game difficulty set to Normal (modifier: -2). A balanced challenge awaits.';
+            case 'hard':
+                GAME_DIFFICULTY_MODIFIER = -4;
+                return 'Game difficulty set to Hard (modifier: -4). The trail will test your skills!';
+            case 'impossible':
+                GAME_DIFFICULTY_MODIFIER = -6;
+                return 'Game difficulty set to Impossible (modifier: -6). Only the most skilled will survive!';
+            case 'nestmare':
+                GAME_DIFFICULTY_MODIFIER = -10;
+                return 'Game difficulty set to NESTMARE (modifier: -10). Good luck... you\'ll need it!';
+            default:
+                throw new Error('Invalid difficulty level. Choose: easy, normal, hard, impossible, or nestmare');
         }
     }
 )
@@ -179,4 +211,4 @@ const updateStatsTool = new llmTool(
     }
 );
 
-export { addItemTool, removeItemTool, getAllItemsTool, getPossiblePathsTool, getDistanceAndEventCountTool, eventDifficulty, addMoneyTool, removeMoneyTool, listInventoryTool, getMoneyTool, getStatsTool, updateStatsTool };
+export { addItemTool, removeItemTool, getAllItemsTool, getPossiblePathsTool, getDistanceAndEventCountTool, eventDifficulty, addMoneyTool, removeMoneyTool, listInventoryTool, getMoneyTool, getStatsTool, updateStatsTool, setGameDifficultyTool };
