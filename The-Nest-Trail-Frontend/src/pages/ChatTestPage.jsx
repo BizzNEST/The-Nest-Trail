@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { sendMessage, startGame, fetchStats, getInventory } from '../api/api';
+import { sendMessage, startGame, fetchStats, getInventory, resetGame } from '../api/api';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import ChatBackground from '../components/ChatBackground';
@@ -28,10 +28,7 @@ function ChatTestPage() {
     const [statsLoading, setStatsLoading] = useState(false);
     
     // placeholder game stats state
-    const [inGameSeconds, setInGameSeconds] = useState(0);
-    const [macguffinsCount] = useState(3); // placeholder value
     const [money, setMoney] = useState(null);
-    const [currentRoute] = useState({ from: 'Santa Cruz', to: 'Watsonville' }); // placeholder value
     
     const [inventory, setInventory] = useState([]); // State to hold inventory items
     // eslint-disable-next-line no-unused-vars
@@ -54,14 +51,9 @@ function ChatTestPage() {
         }
     };
 
-    // Start the game on initial component load
-    useEffect(() => {
-        // Start the game by prompting the LLM
-        if (didStart.current) return;
-        didStart.current = true;
+    const start = async () => {
         setLoading(true);
-        async function start() {
-            try {
+        try {
                 const response = await startGame();
                 const botMessage = { text: response, sender: 'bot' };
                 setMessages(prev => [...prev, botMessage]);
@@ -72,7 +64,13 @@ function ChatTestPage() {
             } finally {
                 setLoading(false);
             }
-        }
+    }
+
+    // Start the game on initial component load
+    useEffect(() => {
+        // Start the game by prompting the LLM
+        if (didStart.current) return;
+        didStart.current = true;
         start();
     }, []);
 
@@ -150,6 +148,17 @@ function ChatTestPage() {
         if (e.key === 'Enter' && !e.shiftKey) {
             e.preventDefault();
             handleSend();
+        }
+    };
+
+    const handleReset = async () => {
+        try {
+            await resetGame();
+        } catch (error) {
+            console.error('Error resetting game:', error);
+        } finally {
+            console.log("Reloading page now...");
+            window.location.reload();
         }
     };
 
@@ -321,6 +330,18 @@ function ChatTestPage() {
                             className="send-button"
                         >
                             Send
+                        </button>
+                        <button
+                            onClick={async () => {
+                                const confirmed = window.confirm("Are you sure you want to reset the game? This action cannot be undone.");
+                                if (confirmed) {
+                                    await handleReset();
+                                }
+                            }}
+                            disabled={loading}
+                            className="send-button reset-button"
+                        >
+                            Reset Game
                         </button>
                     </div>
                 </div>

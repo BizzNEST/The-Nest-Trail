@@ -87,6 +87,16 @@ class llmClass {
         });
         return errorMessage;
     }
+
+    resetGame(args) {
+        console.log("Clearing chat history to reset game...");
+        this.history = [];
+        this.history.push({
+            role: "system",
+            content: this.instructions
+        });
+    }
+
 }
 
 function add(args) {

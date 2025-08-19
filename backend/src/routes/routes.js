@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { getLeaderboard } from '../controllers/routeFinder.js';
-import { sendMessage } from './llmApi.js';
+import { sendMessage, resetInventory, resetChatHistory } from './llmApi.js';
 import sharedInventory from '../../models/sharedInventory.js';
 import sharedStats from '../../models/sharedStats.js';
 
@@ -39,6 +39,19 @@ router.get('/api/stats', (req, res) => {
   } catch (error) {
       console.error('Error fetching stats:', error.message);
       res.status(500).json({ error: 'Failed to fetch stats' });
+  }
+});
+
+// reset game backend route
+router.post('/api/reset', (req, res) => {
+  try {
+    resetInventory();
+    resetChatHistory();
+    const newStats = sharedStats.resetStats();
+    res.status(200).json(newStats);
+  } catch (err) {
+    console.error('Error resetting game:', err.message);
+    res.status(500).json({ error: 'Failed to reset game' });
   }
 });
 
