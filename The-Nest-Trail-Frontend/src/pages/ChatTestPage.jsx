@@ -270,6 +270,7 @@ function ChatTestPage() {
             <ChatBackground 
                 animationType={backgroundState.type}
                 showDust={backgroundState.showDust}
+                location={lastUpdateStats?.location || stats.currentLocation || ''}
             />
             <ToastContainer toasts={toasts} onRemoveToast={removeToast} />
             <div className="chat-layout">

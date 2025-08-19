@@ -1,6 +1,6 @@
 import React from 'react';
 
-function ChatBackground({ animationType = 'animated', showDust = true }) {
+function ChatBackground({ animationType = 'animated', showDust = true, location = '' }) {
     const getBackgroundClass = () => {
         switch (animationType) {
             case 'static':
@@ -13,14 +13,32 @@ function ChatBackground({ animationType = 'animated', showDust = true }) {
         }
     };
 
+    const getCityImage = () => {
+        // Extract single word location and match to available city images
+        const singleWordLocation = location.trim().split(/\s+/)[0];
+        const availableCities = ['Gilroy', 'Modesto', 'Salinas', 'Stockton', 'Watsonville'];
+        
+        // Check if the location matches any of our available city images
+        const cityMatch = availableCities.find(city => 
+            city.toLowerCase() === singleWordLocation.toLowerCase()
+        );
+        
+        if (cityMatch) {
+            return `/src/assets/${cityMatch}.png`;3
+        }
+        
+        // Fallback to welcome banner if no city match found
+        return "/src/assets/welcome-banner2.jpeg";
+    };
+
     return (
         <div className={getBackgroundClass()}>
             {/* Static background image for single-word locations */}
             {animationType === 'static' && (
                 <div className="static-background">
                     <img 
-                        src="/src/assets/welcome-banner2.jpeg" 
-                        alt="Static location view"
+                        src={getCityImage()} 
+                        alt={`${location} view`}
                         className="static-background-image"
                     />
                 </div>
