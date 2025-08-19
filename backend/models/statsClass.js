@@ -40,6 +40,11 @@ class Stats {
         itemList = itemList.items.map(item => item.name + ": " + item.count).join(", ") + " and $" + itemList.money + " in cash"
         return "Update successful.  Time and location updated.  Current player inventory: " + itemList
     }
+
+    resetStats() {
+        this.elapsedMinutes = 0;
+        this.currentLocation = spawnLocations[Math.floor(Math.random() * spawnLocations.length)];
+    }
 }
 
 export default Stats
