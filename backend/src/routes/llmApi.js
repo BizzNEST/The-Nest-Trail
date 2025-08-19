@@ -11,7 +11,8 @@ import {
   getStatsTool,
   updateStatsTool,
   eventDifficulty,
-  setGameDifficultyTool
+  setGameDifficultyTool,
+  gameOverTool
 } from '../llm_tools/toolDefinitions.js';
 
 // --- Default inventory setup ---
@@ -36,7 +37,8 @@ const tools = [
   getStatsTool,
   updateStatsTool,
   eventDifficulty,
-  setGameDifficultyTool
+  setGameDifficultyTool,
+  gameOverTool
 ];
 
 const system_prompt = `
@@ -74,7 +76,7 @@ If they arrive at HQ without all three items, they cannot complete the game.
 **Evaluation Order (before ANY narration):**
 1) \`updateStatsTool(timeElapsed, location, distanceTraveled)\`
 2) \`getStatsTool()\` and \`listInventoryTool()\`
-3) Evaluate the following predicates. If any LOSS predicate is true, end the game immediately using the GAME OVER template. If the WIN predicate is true, end the game immediately using the VICTORY template.
+3) Evaluate the following predicates. If any LOSS predicate is true, call \`gameOverTool(reason, message)\` then end the game immediately using the GAME OVER template. If the WIN predicate is true, call \`gameOverTool("victory", message)\` then end the game immediately using the VICTORY template.
 
 **WIN (all must be true):**
 - The player has visited all three required centers (not counting their starting center) **and** holds the three required special items.
@@ -95,11 +97,13 @@ If they arrive at HQ without all three items, they cannot complete the game.
 - You may not gift resources or items unless justified by a prior tool-backed outcome.
 - You may not retroactively relax difficulties to avoid a loss.
 
-**Templates (use headings verbatim):**
+**Templates (use headings verbatim, but call gameOverTool FIRST):**
 - **GAME OVER — You Lost**  
-  State the exact reason in one sentence (e.g., “You ran out of gas 12 miles from Modesto.”).  
+  First call: \`gameOverTool("defeat", "reason for loss")\`  
+  Then state the exact reason in one sentence (e.g., "You ran out of gas 12 miles from Modesto.").  
 - **VICTORY — You Completed The NEST Trail**  
-  All NEST centers visited, items secured, and arrival at HQ. Optionally include time/resources remaining.
+  First call: \`gameOverTool("victory", "victory message")\`  
+  Then state: All NEST centers visited, items secured, and arrival at HQ. Optionally include time/resources remaining.
 
 ---
 

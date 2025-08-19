@@ -41,6 +41,10 @@ function ChatTestPage() {
     // Toast notifications state
     const [toasts, setToasts] = useState([]);
     const [lastToolCallId, setLastToolCallId] = useState(0);
+    
+    // Background animation state
+    const [lastUpdateStats, setLastUpdateStats] = useState(null);
+    const [isGameOver, setIsGameOver] = useState(false);
 
     // Memoize ReactMarkdown components to prevent recreation on every render
     const markdownComponents = useMemo(() => ({
@@ -142,12 +146,37 @@ function ChatTestPage() {
                 const newToolCalls = await getToolCalls(lastToolCallId);
                 
                 if (newToolCalls.length > 0) {
-                    // Add new tool calls as toasts
-                    const newToasts = newToolCalls.map(toolCall => ({
-                        id: toolCall.id,
-                        timestamp: toolCall.timestamp,
-                        userReturn: toolCall.userReturn
-                    }));
+                    // Check for gameOver calls
+                    const gameOverCalls = newToolCalls.filter(toolCall => 
+                        toolCall.userReturn && toolCall.userReturn.tool === 'gameOver'
+                    );
+                    
+                    if (gameOverCalls.length > 0) {
+                        setIsGameOver(true);
+                    }
+                    
+                    // Check for updateStats calls to update background
+                    const updateStatsCalls = newToolCalls.filter(toolCall => 
+                        toolCall.userReturn && toolCall.userReturn.tool === 'updateStats'
+                    );
+                    
+                    if (updateStatsCalls.length > 0) {
+                        // Use the most recent updateStats call
+                        const latestUpdateStats = updateStatsCalls[updateStatsCalls.length - 1];
+                        setLastUpdateStats({
+                            location: latestUpdateStats.userReturn.location,
+                            distanceTraveled: latestUpdateStats.userReturn.distanceTraveled
+                        });
+                    }
+                    
+                    // Add new tool calls as toasts, but only show ones that should display toasts
+                    const newToasts = newToolCalls
+                        .filter(toolCall => toolCall.userReturn && toolCall.userReturn.showToast !== false)
+                        .map(toolCall => ({
+                            id: toolCall.id,
+                            timestamp: toolCall.timestamp,
+                            userReturn: toolCall.userReturn
+                        }));
                     
                     setToasts(prev => [...prev, ...newToasts]);
                     setLastToolCallId(newToolCalls[newToolCalls.length - 1].id);
@@ -208,9 +237,40 @@ function ChatTestPage() {
         setToasts(prev => prev.filter(toast => toast.id !== toastId));
     };
 
+    // Determine background animation state based on location, distance, and game state
+    const getBackgroundState = () => {
+        // Game over always shows static image
+        if (isGameOver) {
+            return { type: 'static', showDust: false };
+        }
+        
+        if (!lastUpdateStats) {
+            return { type: 'animated', showDust: true }; // Default state
+        }
+
+        const { location, distanceTraveled } = lastUpdateStats;
+        const wordCount = location.trim().split(/\s+/).length;
+        
+        if (wordCount === 1) {
+            // Single word location - show static image
+            return { type: 'static', showDust: false };
+        } else if (distanceTraveled > 0) {
+            // Multiple words and moving - show full animation
+            return { type: 'animated', showDust: true };
+        } else {
+            // Multiple words but not moving - stop animation, hide dust
+            return { type: 'paused', showDust: false };
+        }
+    };
+
+    const backgroundState = getBackgroundState();
+
     return (
         <div className="chat-page">
-            <ChatBackground />
+            <ChatBackground 
+                animationType={backgroundState.type}
+                showDust={backgroundState.showDust}
+            />
             <ToastContainer toasts={toasts} onRemoveToast={removeToast} />
             <div className="chat-layout">
                 {/* Left Column - Map and Inventory */}

@@ -34,6 +34,8 @@ const Toast = ({ toast, onRemove, index = 0 }) => {
                 return '🎲';
             case 'updateStats':
                 return '📍';
+            case 'gameOver':
+                return '🎮';
             default:
                 return '⚡';
         }
@@ -51,6 +53,8 @@ const Toast = ({ toast, onRemove, index = 0 }) => {
                 return '#3b82f6'; // blue
             case 'updateStats':
                 return '#8b5cf6'; // purple
+            case 'gameOver':
+                return '#dc2626'; // dark red for game over
             default:
                 return '#6b7280'; // gray
         }

@@ -266,21 +266,22 @@ const updateStatsTool = new llmTool(
         
         console.log('[UPDATE_STATS] User return called with:', { timeElapsed, location, distanceTraveled });
         
-        // Only show toasts for meaningful updates
-        if (timeElapsed <= 0 && distanceTraveled <= 0) {
-            console.log('[UPDATE_STATS] Skipping toast - no meaningful changes');
-            return null; // Don't show toast for minor updates
-        }
-        
         let title = '';
         let message = '';
+        let showToast = true;
         
-        if (distanceTraveled > 0) {
-            title = '🚗 Traveling';
-            message = `${distanceTraveled} miles to ${location}`;
-        } else if (timeElapsed > 0) {
-            title = '⏱️ Time Passed';
-            message = `${timeElapsed} minutes at ${location}`;
+        // Only show toasts for meaningful updates
+        if (timeElapsed <= 0 && distanceTraveled <= 0) {
+            console.log('[UPDATE_STATS] No meaningful changes - will send update but not show toast');
+            showToast = false;
+        } else {
+            if (distanceTraveled > 0) {
+                title = '🚗 Traveling';
+                message = `${distanceTraveled} miles to ${location}`;
+            } else if (timeElapsed > 0) {
+                title = '⏱️ Time Passed';
+                message = `${timeElapsed} minutes at ${location}`;
+            }
         }
         
         const userReturn = {
@@ -289,7 +290,8 @@ const updateStatsTool = new llmTool(
             message: message,
             timeElapsed: timeElapsed,
             location: location,
-            distanceTraveled: distanceTraveled
+            distanceTraveled: distanceTraveled,
+            showToast: showToast
         };
         
         console.log('[UPDATE_STATS] Returning user return:', userReturn);
@@ -297,4 +299,34 @@ const updateStatsTool = new llmTool(
     }
 );
 
-export { addItemTool, removeItemTool, getAllItemsTool, getPossiblePathsTool, getDistanceAndEventCountTool, eventDifficulty, addMoneyTool, removeMoneyTool, listInventoryTool, getMoneyTool, getStatsTool, updateStatsTool, setGameDifficultyTool };
+const gameOverTool = new llmTool(
+    'gameOver',
+    'Call this when the game ends (either win or lose). This will display the game over screen.',
+    {
+        reason: new llmToolProperty('reason', 'string', 'The reason for game over (e.g., "victory", "defeat", "ran out of gas", etc.)', true),
+        message: new llmToolProperty('message', 'string', 'A message to display to the player explaining the game over condition', true)
+    },
+    (args) => {
+        const { reason, message } = args;
+        console.log(`[GAME_OVER] Game ended: ${reason} - ${message}`);
+        return `Game Over: ${reason}. ${message}`;
+    },
+    (args, result) => {
+        const { reason, message } = args;
+        
+        console.log('[GAME_OVER] User return called with:', { reason, message });
+        
+        const userReturn = {
+            tool: 'gameOver',
+            title: '🎮 Game Over',
+            message: message,
+            reason: reason,
+            showToast: true
+        };
+        
+        console.log('[GAME_OVER] Returning user return:', userReturn);
+        return userReturn;
+    }
+);
+
+export { addItemTool, removeItemTool, getAllItemsTool, getPossiblePathsTool, getDistanceAndEventCountTool, eventDifficulty, addMoneyTool, removeMoneyTool, listInventoryTool, getMoneyTool, getStatsTool, updateStatsTool, setGameDifficultyTool, gameOverTool };
