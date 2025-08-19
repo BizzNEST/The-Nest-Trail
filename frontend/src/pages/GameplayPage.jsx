@@ -188,7 +188,7 @@ function ChatTestPage() {
             <div className="chat-layout">
                 {/* Left Column - Map and Inventory */}
                 <div className="map-column">
-                <div className="map-container stats-container">
+                    <div className="map-container stats-container">
                         <h3 className="map-title">Game Stats</h3>
                         <div className="inventory-list">
                             <div className="inventory-item">
@@ -206,7 +206,7 @@ function ChatTestPage() {
                                 </div>
                             )}
                         </div>
-                    </div>
+                </div>
                     
                     <div className="inventory-container inventory-container--tall">
                         <h3 className="inventory-title">Inventory</h3>

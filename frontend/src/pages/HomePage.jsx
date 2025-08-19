@@ -6,7 +6,6 @@ function HomePage() {
     const [data, setData] = useState(null);
     useEffect(() => {
         testConnection().then((res => setData(res)));
-        console.log(data);
     }, [data]);
 
     return (

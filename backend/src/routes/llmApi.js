@@ -32,7 +32,7 @@ const tools = [
 export const resetInventory = async () => {
     // --- Default inventory setup ---
   sharedInventory.clearInventory();
-  sharedInventory.setMoney(100); // <-- Using Inventory.setMoney
+  sharedInventory.setMoney(100);
 
   sharedInventory.addItem('Laptops', 'Portable computers for work', 1);
   sharedInventory.addItem('Coffee', 'Hot caffeinated beverage', 3);
