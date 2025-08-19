@@ -9,6 +9,8 @@ class Item {
 class Inventory {
   constructor() {
     this.items = [];
+    // NEW: Track Money in inventory
+    this.money = 0;
   }
 
   addItem(name, description, count) {
@@ -31,21 +33,27 @@ class Inventory {
   }
 
   removeItem(name, count) {
+     if (!Number.isInteger(count) || count <= 0) {
+      return "Invalid remove count.  Please check your inventory and try again."
+     }
     const existingItem = this.items.find(item => item.name === name);
     if (!existingItem) {
       console.warn(`Item with name "${name}" not found.`);
-      return;
+      return "Item not found.  Please check your inventory and try again.";
     }
   
     if (existingItem.count < count) {
-      throw new Error(`Not enough items to remove. Available count: ${existingItem.count}`);
+      const message = `Not enough ${name} to remove. Available count: ${existingItem.count}`;
+      console.log(message);
+      return message;
     }
-  
+
     existingItem.count -= count;
   
     if (existingItem.count === 0) {
       this.items = this.items.filter(item => item.name !== name);
     }
+    return "Successfully removed " + count + " " + name + " from inventory"
   }
 
   clearInventory() {
@@ -54,7 +62,46 @@ class Inventory {
   }
 
   listItems() {
-    return this.items;
+    return {
+      items: this.items,
+      money: this.money
+    };
+  }
+  
+  setMoney(value) {
+    if (!Number.isInteger(value)|| value < 0) {
+      throw new Error('Invalid money value')
+    }
+    this.money = value;
+  }
+
+  getMoney() {
+    return this.money;
+  }
+
+  addMoney(amount) {
+    if (!Number.isInteger(amount) || amount <= 0) {
+      throw new Error('Amount to add must be a positive integer')
+    }
+    this.money += amount;
+    return this.money;
+  }
+
+  removeMoney(amount) {
+    if (!Number.isInteger(amount) || amount <= 0) {
+      throw new Error('Amount to remove must be a positive integer')
+    }
+    if (this.money < amount) {
+      const message = `Insufficient funds. Current balance: ${this.money}`;
+      console.log(message);
+      return message;
+    }
+    this.money -= amount;
+    return this.money;
+  }
+
+  getMoney() {
+    return this.money;
   }
 }
 
