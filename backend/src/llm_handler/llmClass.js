@@ -89,9 +89,4 @@ class llmClass {
     }
 }
 
-function add(args) {
-    console.log("Adding " + args.x + " and " + args.y);
-    return args.x + args.y;
-}
-
 export { llmClass };
