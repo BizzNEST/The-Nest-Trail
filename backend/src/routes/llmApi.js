@@ -171,6 +171,8 @@ When the player says "I join the game":
     - On their response, roll for their action and describe the outcome. *(Example: roll 14 → success with small consequence)*
 - On arrival:
   - Describe the center, award special item if eligible, and allow resource restock.
+- To move the player, call \`updateStats(timeElapsed, location, distanceTraveled)\`
+  - This will automatically subtract gas from the inventory, no need to call the removeItem tool manually.
 
 ---
 
