@@ -3,6 +3,7 @@ import { getLeaderboard } from '../controllers/routeFinder.js';
 import { sendMessage } from './llmApi.js';
 import sharedInventory from '../../models/sharedInventory.js';
 import sharedStats from '../../models/sharedStats.js';
+import sharedToolCallTracker from '../../models/sharedToolCalls.js';
 
 const router = Router();
 
@@ -39,6 +40,22 @@ router.get('/api/stats', (req, res) => {
   } catch (error) {
       console.error('Error fetching stats:', error.message);
       res.status(500).json({ error: 'Failed to fetch stats' });
+  }
+});
+
+// Tool calls polling endpoint
+router.get('/api/tool-calls', (req, res) => {
+  try {
+      const lastId = parseInt(req.query.lastId) || 0;
+      const newToolCalls = sharedToolCallTracker.getNewToolCalls(lastId);
+      
+      // Clean up old tool calls periodically
+      sharedToolCallTracker.clearOldToolCalls();
+      
+      res.json({ toolCalls: newToolCalls });
+  } catch (error) {
+      console.error('Error fetching tool calls:', error.message);
+      res.status(500).json({ error: 'Failed to fetch tool calls' });
   }
 });
 

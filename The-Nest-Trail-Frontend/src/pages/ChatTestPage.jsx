@@ -1,8 +1,9 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
-import { sendMessage, startGame, fetchStats, getInventory } from '../api/api';
+import { sendMessage, startGame, fetchStats, getInventory, getToolCalls } from '../api/api';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import ChatBackground from '../components/ChatBackground';
+import ToastContainer from '../components/Toast';
 
 const emojiMap = {
   "Laptops": "💻",
@@ -36,6 +37,10 @@ function ChatTestPage() {
     const [inventory, setInventory] = useState([]); // State to hold inventory items
     // eslint-disable-next-line no-unused-vars
     const [inventoryLoading, setInventoryLoading] = useState(false); // Loading state for inventory
+    
+    // Toast notifications state
+    const [toasts, setToasts] = useState([]);
+    const [lastToolCallId, setLastToolCallId] = useState(0);
 
     // Memoize ReactMarkdown components to prevent recreation on every render
     const markdownComponents = useMemo(() => ({
@@ -130,6 +135,32 @@ function ChatTestPage() {
         return () => clearInterval(intervalId);
     }, []);
 
+    // Poll for tool calls to show as toasts
+    useEffect(() => {
+        const pollToolCalls = async () => {
+            try {
+                const newToolCalls = await getToolCalls(lastToolCallId);
+                
+                if (newToolCalls.length > 0) {
+                    // Add new tool calls as toasts
+                    const newToasts = newToolCalls.map(toolCall => ({
+                        id: toolCall.id,
+                        timestamp: toolCall.timestamp,
+                        userReturn: toolCall.userReturn
+                    }));
+                    
+                    setToasts(prev => [...prev, ...newToasts]);
+                    setLastToolCallId(newToolCalls[newToolCalls.length - 1].id);
+                }
+            } catch (error) {
+                console.error('Error polling tool calls:', error);
+            }
+        };
+
+        const intervalId = setInterval(pollToolCalls, 1000); // Poll every second
+        return () => clearInterval(intervalId);
+    }, [lastToolCallId]);
+
     const formatTime = (totalMinutes) => {
         const hours = Math.floor(totalMinutes / 60);
         const minutes = totalMinutes % 60;
@@ -173,9 +204,14 @@ function ChatTestPage() {
         }
     };
 
+    const removeToast = (toastId) => {
+        setToasts(prev => prev.filter(toast => toast.id !== toastId));
+    };
+
     return (
         <div className="chat-page">
             <ChatBackground />
+            <ToastContainer toasts={toasts} onRemoveToast={removeToast} />
             <div className="chat-layout">
                 {/* Left Column - Map and Inventory */}
                 <div className="map-column">
