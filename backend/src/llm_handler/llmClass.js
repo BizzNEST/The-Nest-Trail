@@ -1,6 +1,5 @@
 import dotenv from 'dotenv';
 import OpenAI from "openai";
-import { llmTool, llmToolProperty } from '../llm_tools/toolClass.js';
 
 dotenv.config();
 

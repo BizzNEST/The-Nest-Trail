@@ -37,7 +37,7 @@ export const sendMessage = async (message) => {
     }
 }
 
-// similar request but no parameter to start game
+// similar request as sendMessage but no parameter to start game
 export const startGame = async () => {
     const message = "I joined the game";
     try {

@@ -41,7 +41,7 @@ const MessageItem = memo(({ msg, markdownComponents }) => {
 
 MessageItem.displayName = 'MessageItem';
 
-function ChatTestPage() {
+function GameplayPage() {
     const [messages, setMessages] = useState([]);
     const [input, setInput] = useState('');
     const [loading, setLoading] = useState(false);
@@ -309,7 +309,7 @@ function ChatTestPage() {
             <div className="chat-layout">
                 {/* Left Column - Map and Inventory */}
                 <div className="map-column">
-                <div className="map-container stats-container">
+                    <div className="map-container stats-container">
                         <h3 className="map-title">Game Stats</h3>
                         <div className="inventory-list">
                             <div className="inventory-item">
@@ -327,7 +327,7 @@ function ChatTestPage() {
                                 </div>
                             )}
                         </div>
-                    </div>
+                </div>
                     
                     <div className="inventory-container inventory-container--tall">
                         <h3 className="inventory-title">Inventory</h3>
@@ -433,4 +433,4 @@ function ChatTestPage() {
     );
 }
 
-export default ChatTestPage;
+export default GameplayPage;
