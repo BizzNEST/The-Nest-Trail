@@ -33,6 +33,7 @@ router.get('/api/items', (req, res) => {
   }
 });
 
+// fetch game stats
 router.get('/api/stats', (req, res) => {
   try {
       const stats = sharedStats.getStats();

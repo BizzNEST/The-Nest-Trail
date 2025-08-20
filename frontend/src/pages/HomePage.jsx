@@ -6,7 +6,6 @@ function HomePage() {
     const [data, setData] = useState(null);
     useEffect(() => {
         testConnection().then((res => setData(res)));
-        console.log(data);
     }, [data]);
 
     return (
@@ -22,7 +21,7 @@ function HomePage() {
                         Will you get through The NEST Trail?
                     </p>
                     
-                    <Link to="/chat-test" className="cta-button">
+                    <Link to="/play-game" className="cta-button">
                         Start the Trail
                         <span className="arrow">→</span>
                     </Link>
