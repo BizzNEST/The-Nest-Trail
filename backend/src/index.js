@@ -10,7 +10,8 @@ const app = express();
 const allowedOrigins = [
   'http://localhost:5173',                 // Vite dev (adjust if needed)
   'http://localhost:3000',                 // CRA/Next dev (optional)
-  'https://bizznest.github.io',         // <-- your org’s GitHub Pages origin
+  'https://bizznest.github.io',           // <-- your org's GitHub Pages origin
+  'https://the-nest-trail.pages.dev',     // Cloudflare Pages deployment
   process.env.FRONTEND_ORIGIN              // optional: custom domain
 ].filter(Boolean);
 
