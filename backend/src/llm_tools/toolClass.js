@@ -1,4 +1,5 @@
 import sharedInventory from "../../models/sharedInventory.js";
+import sharedToolCallTracker from "../../models/sharedToolCalls.js";
 
 class llmToolProperty {
 
@@ -11,7 +12,7 @@ class llmToolProperty {
 }
 
 class llmTool {
-    constructor(name, description, properties, execute) {
+    constructor(name, description, properties, execute, userReturnFunction = null) {
         this.name = name;
         this.description = description;
         this.requiredProperties = Object.keys(properties).filter(key => properties[key].required);
@@ -29,11 +30,24 @@ class llmTool {
             additionalProperties: false
         };
         this.execute = execute;
+        this.userReturnFunction = userReturnFunction;
     }
 
     // Make the instance callable, delegating to execute
     call(args) {
-        return this.execute(args, sharedInventory);
+        const result = this.execute(args, sharedInventory);
+        
+        // If there's a user return function, generate user notification data
+        if (this.userReturnFunction) {
+            const userReturn = this.userReturnFunction(args, result);
+            
+            // Only track non-null user returns
+            if (userReturn !== null && userReturn !== undefined) {
+                sharedToolCallTracker.addToolCall(this.name, args, userReturn);
+            }
+        }
+        
+        return result;
     }
 
     formatOpenAIReadable() {

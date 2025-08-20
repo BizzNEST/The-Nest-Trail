@@ -17,7 +17,15 @@ const addItemTool = new llmTool(
         const { name, description, count } = args;
         sharedInventory.addItem(name, description, count);
         return `Item "${name}" added successfully.`;
-    }
+    },
+    (args, result) => ({
+        tool: 'addItem',
+        title: 'Item Added',
+        message: `${args.name} x${args.count}`,
+        count: args.count,
+        name: args.name,
+        description: args.description
+    })
 );
 
 const removeItemTool = new llmTool(
@@ -29,8 +37,24 @@ const removeItemTool = new llmTool(
     },
     (args) => {
         const { name, count } = args;
-        sharedInventory.removeItem(name, count);
-        return `Item "${name}" removed successfully.`;
+        const result = sharedInventory.removeItem(name, count);
+        return result;
+    },
+    (args, result) => {
+        // Only show toast for successful removals
+        const isSuccess = result.includes('Successfully removed');
+        
+        if (!isSuccess) {
+            return null; // Don't show toast for errors
+        }
+        
+        return {
+            tool: 'removeItem',
+            title: 'Item Removed',
+            message: `${args.name} x${args.count}`,
+            count: args.count,
+            name: args.name
+        };
     }
 );
 
@@ -49,7 +73,13 @@ const addMoneyTool = new llmTool(
     if (!Number.isInteger(amt) || amt <= 0) throw new Error('Amount must be a positive integer.');
     sharedInventory.addMoney(amt);                 // uses your Inventory.addMoney
     return `Money increased by ${amt}. Balance: ${sharedInventory.getMoney()}`;
-  }
+  },
+  (args, result) => ({
+    tool: 'addMoney',
+    title: 'Money Gained',
+    message: `+$${args.amount}`,
+    amount: args.amount
+  })
 );
 
 const removeMoneyTool = new llmTool(
@@ -65,7 +95,13 @@ const removeMoneyTool = new llmTool(
     if (!Number.isInteger(amt) || amt <= 0) throw new Error('Amount must be a positive integer.');
     sharedInventory.removeMoney(amt);              // uses your Inventory.removeMoney
     return `Money decreased by ${amt}. Balance: ${sharedInventory.getMoney()}`;
-  }
+  },
+  (args, result) => ({
+    tool: 'removeMoney',
+    title: 'Money Lost',
+    message: `-$${args.amount}`,
+    amount: args.amount
+  })
 );
 
 // Simple read tools so the AI can inspect state before/after actions
@@ -150,6 +186,22 @@ const eventDifficulty = new llmTool(
         } else {
             return `The player rolled a ${num}.  The outcome of whatever you were rolling for should be based on this.`;
         }
+    },
+    (args, result) => {
+        const { modifier } = args;
+        const rollMatch = result.match(/rolled a (\d+)/);
+        const finalMatch = result.match(/result is (\d+)/);
+        const rolled = rollMatch ? parseInt(rollMatch[1]) : 0;
+        const finalResult = finalMatch ? parseInt(finalMatch[1]) : rolled;
+        
+        return {
+            tool: 'rollDice',
+            title: '🎲 Dice Roll',
+            message: `Rolled ${rolled}${modifier !== 0 ? ` (${finalResult} total)` : ''}`,
+            rolled: rolled,
+            modifier: modifier,
+            finalResult: finalResult
+        };
     }
 )
 
@@ -208,7 +260,73 @@ const updateStatsTool = new llmTool(
         const { timeElapsed, location, distanceTraveled = 0 } = args;
         const result = sharedStats.updateStatus(timeElapsed, location, distanceTraveled);
         return result;
+    },
+    (args, result) => {
+        const { timeElapsed, location, distanceTraveled = 0 } = args;
+        
+        console.log('[UPDATE_STATS] User return called with:', { timeElapsed, location, distanceTraveled });
+        
+        let title = '';
+        let message = '';
+        let showToast = true;
+        
+        // Only show toasts for meaningful updates
+        if (timeElapsed <= 0 && distanceTraveled <= 0) {
+            console.log('[UPDATE_STATS] No meaningful changes - will send update but not show toast');
+            showToast = false;
+        } else {
+            if (distanceTraveled > 0) {
+                title = '🚗 Traveling';
+                message = `${distanceTraveled} miles to ${location}`;
+            } else if (timeElapsed > 0) {
+                title = '⏱️ Time Passed';
+                message = `${timeElapsed} minutes at ${location}`;
+            }
+        }
+        
+        const userReturn = {
+            tool: 'updateStats',
+            title: title,
+            message: message,
+            timeElapsed: timeElapsed,
+            location: location,
+            distanceTraveled: distanceTraveled,
+            showToast: showToast
+        };
+        
+        console.log('[UPDATE_STATS] Returning user return:', userReturn);
+        return userReturn;
     }
 );
 
-export { addItemTool, removeItemTool, getAllItemsTool, getPossiblePathsTool, getDistanceAndEventCountTool, eventDifficulty, addMoneyTool, removeMoneyTool, listInventoryTool, getMoneyTool, getStatsTool, updateStatsTool, setGameDifficultyTool };
+const gameOverTool = new llmTool(
+    'gameOver',
+    'Call this when the game ends (either win or lose). This will display the game over screen.',
+    {
+        reason: new llmToolProperty('reason', 'string', 'The reason for game over (e.g., "victory", "defeat", "ran out of gas", etc.)', true),
+        message: new llmToolProperty('message', 'string', 'A message to display to the player explaining the game over condition', true)
+    },
+    (args) => {
+        const { reason, message } = args;
+        console.log(`[GAME_OVER] Game ended: ${reason} - ${message}`);
+        return `Game Over: ${reason}. ${message}`;
+    },
+    (args, result) => {
+        const { reason, message } = args;
+        
+        console.log('[GAME_OVER] User return called with:', { reason, message });
+        
+        const userReturn = {
+            tool: 'gameOver',
+            title: '🎮 Game Over',
+            message: message,
+            reason: reason,
+            showToast: true
+        };
+        
+        console.log('[GAME_OVER] Returning user return:', userReturn);
+        return userReturn;
+    }
+);
+
+export { addItemTool, removeItemTool, getAllItemsTool, getPossiblePathsTool, getDistanceAndEventCountTool, eventDifficulty, addMoneyTool, removeMoneyTool, listInventoryTool, getMoneyTool, getStatsTool, updateStatsTool, setGameDifficultyTool, gameOverTool };

@@ -93,6 +93,21 @@ export const getInventory = async () => {
     }
 }
 
+// poll for new tool calls
+export const getToolCalls = async (lastId = 0) => {
+    try {
+        const response = await fetch(`${API_URL}/api/tool-calls?lastId=${lastId}`);
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+        return data.toolCalls;
+    } catch (error) {
+        console.error('Error fetching tool calls:', error);
+        throw error;
+    }
+}
+
 // reset game api call
 export const resetGame = async () => {
     try {
