@@ -27,6 +27,7 @@ pnpm-debug.log*
 # Frontend builds
 client/build/
 client/dist/
+frontend/dist/
 
 # Backend builds (if using TS or compiled code)
 Backend/dist/
