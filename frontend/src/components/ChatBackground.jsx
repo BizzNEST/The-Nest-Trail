@@ -1,4 +1,11 @@
 import React from 'react';
+// Import all city images so Vite includes them in the build
+import GilroyImg from '../assets/Gilroy.png';
+import ModestoImg from '../assets/Modesto.png';
+import SalinasImg from '../assets/Salinas.png';
+import StocktonImg from '../assets/Stockton.png';
+import WatsonvilleImg from '../assets/Watsonville.png';
+import WelcomeBannerImg from '../assets/welcome-banner2.jpeg';
 
 function ChatBackground({ animationType = 'animated', showDust = true, location = '' }) {
     const getBackgroundClass = () => {
@@ -16,19 +23,25 @@ function ChatBackground({ animationType = 'animated', showDust = true, location 
     const getCityImage = () => {
         // Extract single word location and match to available city images
         const singleWordLocation = location.trim().split(/\s+/)[0];
-        const availableCities = ['Gilroy', 'Modesto', 'Salinas', 'Stockton', 'Watsonville'];
+        
+        // Map city names to imported images
+        const cityImages = {
+            'gilroy': GilroyImg,
+            'modesto': ModestoImg,
+            'salinas': SalinasImg,
+            'stockton': StocktonImg,
+            'watsonville': WatsonvilleImg
+        };
         
         // Check if the location matches any of our available city images
-        const cityMatch = availableCities.find(city => 
-            city.toLowerCase() === singleWordLocation.toLowerCase()
-        );
+        const cityImage = cityImages[singleWordLocation.toLowerCase()];
         
-        if (cityMatch) {
-            return `/src/assets/${cityMatch}.png`;3
+        if (cityImage) {
+            return cityImage;
         }
         
         // Fallback to welcome banner if no city match found
-        return "/src/assets/welcome-banner2.jpeg";
+        return WelcomeBannerImg;
     };
 
     return (
