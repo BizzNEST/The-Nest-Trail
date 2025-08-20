@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useMemo } from 'react';
+import { useState, useEffect, useRef, useMemo, memo } from 'react';
 import { sendMessage, startGame, fetchStats, getInventory, getToolCalls, resetGame } from '../api/api';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -13,6 +13,33 @@ const emojiMap = {
   "Laptop Chargers": "🔋",
   "Money": "💰"
 };
+
+// Memoized message component to prevent unnecessary re-renders
+const MessageItem = memo(({ msg, markdownComponents }) => {
+    return (
+        <div className={`message-wrapper ${msg.sender === 'user' ? 'user-message' : 'bot-message'}`}>
+            <div className={`message-bubble ${msg.sender === 'user' ? 'user-bubble' : 'bot-bubble'}`}>
+                <div className="message-sender">
+                    {msg.sender === 'user' ? 'You' : 'NEST AI'}
+                </div>
+                <div className="message-content">
+                    {msg.sender === 'bot' ? (
+                        <ReactMarkdown 
+                            remarkPlugins={[remarkGfm]}
+                            components={markdownComponents}
+                        >
+                            {msg.text}
+                        </ReactMarkdown>
+                    ) : (
+                        msg.text
+                    )}
+                </div>
+            </div>
+        </div>
+    );
+});
+
+MessageItem.displayName = 'MessageItem';
 
 function GameplayPage() {
     const [messages, setMessages] = useState([]);
@@ -32,7 +59,6 @@ function GameplayPage() {
     const [money, setMoney] = useState(null);
     
     const [inventory, setInventory] = useState([]); // State to hold inventory items
-    // eslint-disable-next-line no-unused-vars
     const [inventoryLoading, setInventoryLoading] = useState(false); // Loading state for inventory
     
     // Toast notifications state
@@ -246,8 +272,8 @@ function GameplayPage() {
         setToasts(prev => prev.filter(toast => toast.id !== toastId));
     };
 
-    // Determine background animation state based on location, distance, and game state
-    const getBackgroundState = () => {
+    // Memoize background animation state to prevent unnecessary recalculations
+    const backgroundState = useMemo(() => {
         // Game over always shows static image
         if (isGameOver) {
             return { type: 'static', showDust: false };
@@ -270,9 +296,7 @@ function GameplayPage() {
             // Multiple words but not moving - stop animation, hide dust
             return { type: 'paused', showDust: false };
         }
-    };
-
-    const backgroundState = getBackgroundState();
+    }, [isGameOver, lastUpdateStats]);
 
     return (
         <div className="chat-page">
@@ -349,25 +373,11 @@ function GameplayPage() {
                             </div>
                         )}
                         {messages.map((msg, index) => (
-                            <div key={index} className={`message-wrapper ${msg.sender === 'user' ? 'user-message' : 'bot-message'}`}>
-                                <div className={`message-bubble ${msg.sender === 'user' ? 'user-bubble' : 'bot-bubble'}`}>
-                                    <div className="message-sender">
-                                        {msg.sender === 'user' ? 'You' : 'NEST AI'}
-                                    </div>
-                                    <div className="message-content">
-                                        {msg.sender === 'bot' ? (
-                                            <ReactMarkdown 
-                                                remarkPlugins={[remarkGfm]}
-                                                components={markdownComponents}
-                                            >
-                                                {msg.text}
-                                            </ReactMarkdown>
-                                        ) : (
-                                            msg.text
-                                        )}
-                                    </div>
-                                </div>
-                            </div>
+                            <MessageItem 
+                                key={index} 
+                                msg={msg} 
+                                markdownComponents={markdownComponents}
+                            />
                         ))}
                         {loading && (
                             <div className="message-wrapper bot-message">
